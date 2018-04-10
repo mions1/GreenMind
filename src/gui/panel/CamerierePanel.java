@@ -1,5 +1,6 @@
 package gui.panel;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -10,6 +11,11 @@ import javax.swing.JPanel;
 
 import gui.Login_window;
 
+/**
+ * Finestra del cameriere, dove ci sono i bottoni dei tavoli.
+ * I tavoli verdi sono quelli con ordini non ancora consegnati
+ *
+ */
 public class CamerierePanel extends JPanel implements ActionListener {
 
 	ArrayList<JButton> tavoli;	//Bottoni dei tavoli (10 di def)
@@ -44,9 +50,13 @@ public class CamerierePanel extends JPanel implements ActionListener {
 	 */
 	private ArrayList<JButton> createTavoli() {
 		ArrayList<JButton> tavoli = new ArrayList<>();
+		ArrayList<Integer> tavoliAttivi = lw.getDb().getTavoliAttivi();
+		
 		for (int i = 0; i < 10; i++) {
 			JButton tavolo = new JButton("Tavolo "+(i+1));
 			tavoli.add(tavolo);
+			if ( tavoliAttivi.contains(i+1) )
+				tavolo.setBackground(Color.GREEN);
 		}
 	return tavoli;
 	}

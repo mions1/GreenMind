@@ -14,6 +14,11 @@ import gui.dialog.DialogGestisciProdotto;
 import gui.panel.GestorePanel;
 import gui.panel.LoginPanel;
 
+/**
+ * Finestra di gestione, usata dal dirigente, query di statistiche e gestione prodotti,persone e eventi
+ * 
+ *
+ */
 public class GestoreListener implements ActionListener {
 
 	GestorePanel source;

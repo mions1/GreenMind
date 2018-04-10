@@ -23,6 +23,12 @@ import org.jdesktop.swingx.prompt.PromptSupport;
 import database.Database;
 import gui.panel.GestorePanel;
 
+/**
+ * Dialog per aggiungere ed eliminare prodotti
+ * Ci sono i campi per inserire gli attributi del prodotto da aggiungere
+ * Accanto al pulsante elimina si trova una combobox dei prodotti salvati nel db, selezionane uno per eliminarlo
+ *
+ */
 public class DialogGestisciProdotto extends JPanel implements ActionListener {
 
 	JTextField nome;

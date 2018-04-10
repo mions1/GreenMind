@@ -16,6 +16,12 @@ import org.jdesktop.swingx.prompt.PromptSupport;
 import database.Database;
 import gui.panel.GestorePanel;
 
+/**
+ * Dialog per aggiungere ed eliminare eventi
+ * Ci sono i campi per inserire gli attributi dell'evento da aggiungere
+ * Accanto al pulsante elimina si trova una combobox degli eventi salvati nel db, selezionane uno per eliminarlo
+ *
+ */
 public class DialogGestisciEvento extends JPanel implements ActionListener {
 
 	JTextField nome;
@@ -91,6 +97,9 @@ public class DialogGestisciEvento extends JPanel implements ActionListener {
 		}
 	}
 	
+	/**
+	 * Crea la combobox degli eventi gia salvati nel db
+	 */
 	public void creaEventiElimina() {
 		eventi.removeAllItems();
 		ArrayList<ArrayList<String>> eventi = source.getLoginWindow().getDb().getEventi();

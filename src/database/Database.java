@@ -819,4 +819,27 @@ public class Database {
 			return false;
 		}
 	}
+	
+	/**
+	 * Restituisce i tavoli che hanno ordini non consegnati
+	 * @return
+	 */
+	public ArrayList<Integer> getTavoliAttivi() {
+		ArrayList<Integer> tavoli = new ArrayList<Integer>();
+		
+		try {
+			ResultSet res;
+			Statement stmt = c.createStatement();
+			String sql = "SELECT tavolo FROM ordina WHERE consegnato=false";
+			res = stmt.executeQuery(sql);
+			while (res.next()) 
+				tavoli.add(res.getInt(1));
+			stmt.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return tavoli;
+	}
+	
 }

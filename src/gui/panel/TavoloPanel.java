@@ -11,6 +11,11 @@ import javax.swing.JPanel;
 import gui.Login_window;
 import listeners.TavoloListener;
 
+/**
+ * Finestra dove vedere gli ordini di quel tavolo.
+ * Si possono eliminare e segnare come consegnati i vari ordini.
+ *
+ */
 public class TavoloPanel extends JPanel {
 
 	int tavolo;
@@ -61,7 +66,10 @@ public class TavoloPanel extends JPanel {
 		add(ordini_panel);		
 	}
 	
-	
+	/**
+	 * Crea la lista degli ordini del tavolo da mostrare nella finestra
+	 * @return
+	 */
 	private ArrayList<JLabel> createOrdini() {
 		ArrayList<ArrayList<String>> ordini;
 		ArrayList<JLabel> ordini_label = new ArrayList<>();
@@ -126,7 +134,10 @@ public class TavoloPanel extends JPanel {
 		return consegnato;
 	}
 
-
+	public int getTavolo() {
+		return tavolo;
+	}
+	
 	public void setConsegnato(JButton consegnato) {
 		this.consegnato = consegnato;
 	}

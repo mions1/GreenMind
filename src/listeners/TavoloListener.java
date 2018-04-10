@@ -28,15 +28,19 @@ public class TavoloListener implements ActionListener {
 		
 		else if (e.getSource().equals(source.getConsegnato())) {
 			for (JCheckBox check: source.getCheck()) {
-				if (check.isSelected())
+				if (check.isSelected()) {
 					source.getLoginWindow().getDb().setConsegnato(true, Integer.parseInt(check.getActionCommand()));
+					source.getLoginWindow().editPanel(new TavoloPanel(source.getTavolo(), source.getLoginWindow()));
+				}
 			}
 		}
 		
 		else if (e.getSource().equals(source.getElimina())) {
 			for (JCheckBox check: source.getCheck()) {
-				if (check.isSelected())
+				if (check.isSelected()) {
 					source.getLoginWindow().getDb().eliminaOrdine(Integer.parseInt(check.getActionCommand()));
+					source.getLoginWindow().editPanel(new TavoloPanel(source.getTavolo(), source.getLoginWindow()));
+				}
 			}
 		}
 	}

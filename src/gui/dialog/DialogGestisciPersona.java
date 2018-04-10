@@ -20,6 +20,14 @@ import org.jdesktop.swingx.prompt.PromptSupport;
 import database.Database;
 import gui.panel.GestorePanel;
 
+/**
+ * Dialog per aggiungere ed eliminare Persone
+ * Ci sono i campi per inserire gli attributi della persona da aggiungere
+ * Accanto al pulsante elimina si trova una combobox delle persone salvate nel db, selezionane una per eliminarla
+ *
+ *Se si seleziona il checkbox dipendente si abilitano i campi ruolo e stipendio
+ *
+ */
 public class DialogGestisciPersona extends JPanel implements ActionListener {
 
 	JTextField cf;
