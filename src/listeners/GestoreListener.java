@@ -29,21 +29,27 @@ public class GestoreListener implements ActionListener {
 		String sql = "";
 		
 		if (e.getSource().equals(source.getGestisciPersona())) {
-			JOptionPane.showConfirmDialog(
-					null, new DialogGestisciPersona(source),
-					"Gestici Persona",JOptionPane.CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE);
+			JOptionPane.showOptionDialog(
+					null, new DialogGestisciPersona(source),"Gestisci Prodotto", 
+					JOptionPane.DEFAULT_OPTION,
+					JOptionPane.INFORMATION_MESSAGE, 
+					null, new Object[]{}, null);
 		}
 		
 		else if (e.getSource().equals(source.getGestisciProdotto())) {
-			JOptionPane.showConfirmDialog(
-					null, new DialogGestisciProdotto(source),
-					"Gestici Prodotto",JOptionPane.CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE);
+			JOptionPane.showOptionDialog(
+					null, new DialogGestisciProdotto(source),"Gestisci Prodotto", 
+					JOptionPane.DEFAULT_OPTION,
+					JOptionPane.INFORMATION_MESSAGE, 
+					null, new Object[]{}, null);
 		}
 		
 		else if (e.getSource().equals(source.getGestisciEvento())) {
-			JOptionPane.showConfirmDialog(
-					null, new DialogGestisciEvento(source),
-					"Gestici Evento",JOptionPane.CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE);
+			JOptionPane.showOptionDialog(
+					null, new DialogGestisciEvento(source),"Gestisci Prodotto", 
+					JOptionPane.DEFAULT_OPTION,
+					JOptionPane.INFORMATION_MESSAGE, 
+					null, new Object[]{}, null);
 		}
 		
 		else if (e.getSource().equals(source.getIndietro())) {

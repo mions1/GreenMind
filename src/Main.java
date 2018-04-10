@@ -7,7 +7,7 @@ import gui.panel.LoginPanel;
 /*
  * Si passa al gestore?
  * Fai le dialog per eliminare ed aggiungere record da gestore
- * MODIFICHE FATTE!
+ * 
  */
 
 public class Main {

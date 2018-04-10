@@ -89,7 +89,7 @@ public class ClientPanel extends JPanel{
 		bottoni.add(indietro);
 		bottoni.add(ordina);
 		
-		menu_panel.add(new JLabel(Integer.toString(tavolo)));
+		menu_panel.add(new JLabel("Tavolo: "+Integer.toString(tavolo)));
 		
 		menu_panel.add(cibo);
 		for (int i = 0; i < menu_cibo.size(); i++) {

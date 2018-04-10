@@ -11,6 +11,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import org.jdesktop.swingx.prompt.PromptSupport;
+
 import gui.Login_window;
 import gui.ModelloTabella;
 import gui.TabellaRisultati;
@@ -70,6 +72,7 @@ public class GestorePanel extends JPanel {
 	public GestorePanel (Login_window lw) {
 		query = new ArrayList<JButton>();
 		custom_query = new JTextField();
+		PromptSupport.setPrompt("Query Personalizzata", custom_query);
 		esegui = new JButton("Esegui");
 		indietro = new JButton("Indietro");
 		

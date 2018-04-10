@@ -38,10 +38,10 @@ public class MenuListener implements ActionListener {
 			for (int i = 0; i < ordine.size(); i++) 
 				if (qta.get(i) != 0) {
 					testo = testo + 
-						ordine.get(i).get(Database.PRODOTTO_NOME) +
+						ordine.get(i).get(Database.PRODOTTO_NOME-1) +
 						"    x" + qta.get(i) + ":    " +
-						Float.parseFloat(ordine.get(i).get(Database.PRODOTTO_PREZZO))*qta.get(i) + " €\n";
-					totale += Float.parseFloat(ordine.get(i).get(Database.PRODOTTO_PREZZO))*qta.get(i);
+						Float.parseFloat(ordine.get(i).get(Database.PRODOTTO_PREZZO-1))*qta.get(i) + " €\n";
+					totale += Float.parseFloat(ordine.get(i).get(Database.PRODOTTO_PREZZO-1))*qta.get(i);
 				}
 			testo += "\nTotale: "+totale+" €";
 			source.showDialog(testo,ordine,qta);

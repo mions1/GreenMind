@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -125,16 +126,26 @@ public class DialogGestisciPersona extends JPanel implements ActionListener {
 			float stipendio = !this.stipendio.getText().equals("") ? Float.parseFloat(this.stipendio.getText()) : 0;
 			String ruolo = !this.ruolo.getText().equals("") ? this.ruolo.getText() : null;
 			
-			source.getLoginWindow().getDb().nuovaPersona(cf.getText(), 
+			if (source.getLoginWindow().getDb().nuovaPersona(cf.getText(), 
 					nome.getText(), cognome.getText(), 
 					data, nazionalita.getText(), 
-					stipendio, ruolo, dipendente.isSelected(), cliente.isSelected());
+					stipendio, ruolo, dipendente.isSelected(), cliente.isSelected())) {
+				JOptionPane.showMessageDialog(null, "Persona Aggiunta", "Ok", JOptionPane.INFORMATION_MESSAGE);
+				reset();
+			}
+			else
+				JOptionPane.showMessageDialog(null, "Errore nell'aggiunta", "Nope", JOptionPane.ERROR_MESSAGE);
+			
 			creaCfElimina();
 		}
 		
 		else if (e.getSource().equals(elimina)) {
 			String cf = cf_elimina.getSelectedItem() != null ? (String)cf_elimina.getSelectedItem() : "";
-			source.getLoginWindow().getDb().eliminaPersona(cf);
+			if (source.getLoginWindow().getDb().eliminaPersona(cf))
+				JOptionPane.showMessageDialog(null, "Persona eliminata", "Ok", JOptionPane.INFORMATION_MESSAGE);
+			else
+				JOptionPane.showMessageDialog(null, "Errore nell'eliminazione", "Nope", JOptionPane.ERROR_MESSAGE);
+
 			creaCfElimina();
 		}
 		
@@ -150,6 +161,22 @@ public class DialogGestisciPersona extends JPanel implements ActionListener {
 		for (String cf: cfs) {
 			cf_elimina.addItem(cf);
 		}
+	}
+	
+	public void reset() {
+		nome.setText("");
+		cognome.setText("");
+		cf.setText("");
+		nazionalita.setText("");
+		stipendio.setText("");
+		ruolo.setText("");
+		cliente.setSelected(false);
+		dipendente.setSelected(false);
+		stipendio.setEnabled(false);
+		ruolo.setEnabled(false);
+		giorno.setSelectedIndex(0);
+		mese.setSelectedIndex(0);
+		anno.setSelectedIndex(0);
 	}
 	
 }

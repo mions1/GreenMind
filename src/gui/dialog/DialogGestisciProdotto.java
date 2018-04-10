@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
@@ -27,6 +28,7 @@ public class DialogGestisciProdotto extends JPanel implements ActionListener {
 	JTextField nome;
 	JTextField scheda;
 	JTextField tipo;
+	JTextField qta;
 	JTextField prezzo;
 	
 	JComboBox<String> prodotti;
@@ -51,6 +53,7 @@ public class DialogGestisciProdotto extends JPanel implements ActionListener {
 		nome = new JTextField();
 		scheda = new JTextField();
 		tipo = new JTextField();
+		qta = new JTextField();
 		prezzo = new JTextField();
 		
 		prodotti = new JComboBox<String>();
@@ -70,6 +73,7 @@ public class DialogGestisciProdotto extends JPanel implements ActionListener {
 		PromptSupport.setPrompt("Nome", nome);
 		PromptSupport.setPrompt("Scheda", scheda);
 		PromptSupport.setPrompt("Tipo", tipo);
+		PromptSupport.setPrompt("Quantità", qta);
 		PromptSupport.setPrompt("Prezzo", prezzo);
 		
 		categoria.add(cannabis);
@@ -90,6 +94,7 @@ public class DialogGestisciProdotto extends JPanel implements ActionListener {
 		add(nome);
 		add(scheda);
 		add(tipo);
+		add(qta);
 		add(prezzo);
 		add(prodotto_panel);
 		add(inserisci);
@@ -103,12 +108,18 @@ public class DialogGestisciProdotto extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getSource().equals(inserisci)) {
-			source.getLoginWindow().getDb().nuovoProdotto(
+			if (source.getLoginWindow().getDb().nuovoProdotto(
 					nome.getText(), scheda.getText(), 
-					tipo.getText(), 0, 
+					tipo.getText(), Integer.parseInt(qta.getText()), 
 					Integer.parseInt(prezzo.getText()), 
 					cannabis.isSelected(), cibo.isSelected(), 
-					bevande.isSelected());
+					bevande.isSelected())) {
+				JOptionPane.showMessageDialog(null, "Prodotto Aggiunto", "Ok", JOptionPane.INFORMATION_MESSAGE);
+				reset();
+			}
+			else
+				JOptionPane.showMessageDialog(null, "Errore nell'aggiunta", "Nope", JOptionPane.ERROR_MESSAGE);
+			
 			creaProdottiElimina();
 		}
 		
@@ -116,7 +127,11 @@ public class DialogGestisciProdotto extends JPanel implements ActionListener {
 			String codice = prodotti.getSelectedItem().toString();
 			int cod = Integer.parseInt(codice.substring(codice.indexOf("(")+1,codice.length()-1));
 			
-			source.getLoginWindow().getDb().eliminaProdotto(cod);
+			if (source.getLoginWindow().getDb().eliminaProdotto(cod))
+				JOptionPane.showMessageDialog(null, "Prodotto eliminato", "Ok", JOptionPane.INFORMATION_MESSAGE);
+			else
+				JOptionPane.showMessageDialog(null, "Errore nell'eliminazione", "Nope", JOptionPane.ERROR_MESSAGE);
+			
 			creaProdottiElimina();
 		}
 	}
@@ -127,6 +142,16 @@ public class DialogGestisciProdotto extends JPanel implements ActionListener {
 		for (ArrayList<String> prodotto: prodotti) {
 			this.prodotti.addItem( prodotto.get(Database.PRODOTTO_NOME-1) + "(" + prodotto.get(Database.PRODOTTO_COD-1) + ")" );
 		}
+	}
+	
+	public void reset() {
+		nome.setText("");
+		scheda.setText("");
+		tipo.setText("");
+		prezzo.setText("");
+		cannabis.setSelected(true);
+		cibo.setSelected(false);
+		bevande.setSelected(false);
 	}
 	
 }

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -66,8 +67,14 @@ public class DialogGestisciEvento extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getSource().equals(inserisci)) {
-			source.getLoginWindow().getDb().nuovoEvento(
-					nome.getText(), tipo.getText());
+			if (source.getLoginWindow().getDb().nuovoEvento(
+					nome.getText(), tipo.getText())) {
+				JOptionPane.showMessageDialog(null, "Evento aggiunto", "Ok", JOptionPane.INFORMATION_MESSAGE);
+				reset();
+			}
+			else
+				JOptionPane.showMessageDialog(null, "Errore nell'aggiunta", "Nope", JOptionPane.ERROR_MESSAGE);
+				
 			creaEventiElimina();
 		}
 		
@@ -75,7 +82,11 @@ public class DialogGestisciEvento extends JPanel implements ActionListener {
 			String codice = eventi.getSelectedItem().toString();
 			int cod = Integer.parseInt(codice.substring(codice.indexOf("(")+1,codice.length()-1));
 			
-			source.getLoginWindow().getDb().eliminaEvento(cod);
+			if (source.getLoginWindow().getDb().eliminaEvento(cod)) 
+				JOptionPane.showMessageDialog(null, "Evento eliminato", "Ok", JOptionPane.INFORMATION_MESSAGE);
+			else
+				JOptionPane.showMessageDialog(null, "Errore nell'eliminazione", "Nope", JOptionPane.ERROR_MESSAGE);
+
 			creaEventiElimina();
 		}
 	}
@@ -88,4 +99,9 @@ public class DialogGestisciEvento extends JPanel implements ActionListener {
 		}
 	}
 	
+	public void reset() {
+		nome.setText("");
+		tipo.setText("");
+	}
+		
 }

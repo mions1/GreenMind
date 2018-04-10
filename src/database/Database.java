@@ -728,29 +728,33 @@ public class Database {
 		return res;
 	}
 	
-	public void eliminaPersona(String cf) {
+	public boolean eliminaPersona(String cf) {
 		try {
 			Statement stmt = c.createStatement();
 			String sql = "DELETE FROM PERSONA WHERE cf='"+cf+"'";
 			stmt.executeUpdate(sql);
 			stmt.close();
+			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		}
 	}
 	
-	public void eliminaProdotto(int cod) {
+	public boolean eliminaProdotto(int cod) {
 		try {
 			Statement stmt = c.createStatement();
 			String sql = "DELETE FROM prodotto WHERE cod_prodotto="+cod;
 			stmt.executeUpdate(sql);
 			stmt.close();
+			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		}
 	}
 	
-	public void nuovoProdotto(String nome, String scheda, String tipo, int qta, float prezzo, boolean cannabis, boolean cibo, boolean bevanda) {
+	public boolean nuovoProdotto(String nome, String scheda, String tipo, int qta, float prezzo, boolean cannabis, boolean cibo, boolean bevanda) {
 		try {
 			Statement stmt = c.createStatement();
 			String sql = "INSERT INTO prodotto(S1,S2,S3,nome,scheda,tipo,qta,prezzo) "
@@ -760,8 +764,10 @@ public class Database {
 							+qta+", "+prezzo+")";
 			stmt.executeUpdate(sql);
 			stmt.close();
+			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		}
 	}
 	
@@ -787,26 +793,30 @@ public class Database {
 		return eventi;
 	}
 	
-	public void nuovoEvento(String nome, String tipo) {
+	public boolean nuovoEvento(String nome, String tipo) {
 		try {
 			Statement stmt = c.createStatement();
 			String sql = "INSERT INTO evento(nome,tipo) "
 					+ "VALUES('"+nome+"', '"+tipo+"')";
 			stmt.executeUpdate(sql);
 			stmt.close();
+			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		}
 	}
 	
-	public void eliminaEvento(int cod) {
+	public boolean eliminaEvento(int cod) {
 		try {
 			Statement stmt = c.createStatement();
 			String sql = "DELETE FROM evento WHERE cod_evento="+cod;
 			stmt.executeUpdate(sql);
 			stmt.close();
+			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		}
 	}
 }
