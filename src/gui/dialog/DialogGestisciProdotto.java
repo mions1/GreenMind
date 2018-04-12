@@ -37,7 +37,8 @@ public class DialogGestisciProdotto extends JPanel implements ActionListener {
 	JTextField qta;
 	JTextField prezzo;
 	
-	JComboBox<String> prodotti;
+	JComboBox<String> prodotti_elimina;
+	JComboBox<String> prodotti_aggiungi;
 	
 	ButtonGroup categoria;
 	JRadioButton cannabis;
@@ -46,9 +47,12 @@ public class DialogGestisciProdotto extends JPanel implements ActionListener {
 	
 	JButton inserisci;
 	JButton elimina;
+	JTextField qta_aggiungi;
+	JButton aggiungi_qta;
 	
 	JPanel elimina_panel;
 	JPanel prodotto_panel;
+	JPanel qta_panel;
 	
 	GestorePanel source;
 	
@@ -62,7 +66,8 @@ public class DialogGestisciProdotto extends JPanel implements ActionListener {
 		qta = new JTextField();
 		prezzo = new JTextField();
 		
-		prodotti = new JComboBox<String>();
+		prodotti_elimina = new JComboBox<String>();
+		prodotti_aggiungi = new JComboBox<String>();
 		
 		categoria = new ButtonGroup();
 		cannabis = new JRadioButton("Cannabis");
@@ -72,24 +77,33 @@ public class DialogGestisciProdotto extends JPanel implements ActionListener {
 		
 		elimina_panel = new JPanel();
 		prodotto_panel = new JPanel();
+		qta_panel = new JPanel();
 		
 		inserisci = new JButton("Inserisci");
 		elimina = new JButton("Elimina");
+		qta_aggiungi = new JTextField();
+		aggiungi_qta = new JButton("Aggiungi");
 		
 		PromptSupport.setPrompt("Nome", nome);
 		PromptSupport.setPrompt("Scheda", scheda);
 		PromptSupport.setPrompt("Tipo", tipo);
 		PromptSupport.setPrompt("Quantità", qta);
 		PromptSupport.setPrompt("Prezzo", prezzo);
+		PromptSupport.setPrompt("Quantità", qta_aggiungi);
 		
 		categoria.add(cannabis);
 		categoria.add(cibo);
 		categoria.add(bevande);
 		
 		creaProdottiElimina();
+		creaProdottiAggiungi();
 		
-		elimina_panel.add(prodotti);
+		elimina_panel.add(prodotti_elimina);
 		elimina_panel.add(elimina);
+		
+		qta_panel.add(prodotti_aggiungi);
+		qta_panel.add(qta_aggiungi);
+		qta_panel.add(aggiungi_qta);
 		
 		prodotto_panel.add(cannabis);
 		prodotto_panel.add(cibo);
@@ -105,9 +119,11 @@ public class DialogGestisciProdotto extends JPanel implements ActionListener {
 		add(prodotto_panel);
 		add(inserisci);
 		add(elimina_panel);
+		add(qta_panel);
 		
 		inserisci.addActionListener(this);
 		elimina.addActionListener(this);
+		aggiungi_qta.addActionListener(this);
 	}
 
 	@Override
@@ -130,7 +146,7 @@ public class DialogGestisciProdotto extends JPanel implements ActionListener {
 		}
 		
 		else if (e.getSource().equals(elimina)) {
-			String codice = prodotti.getSelectedItem().toString();
+			String codice = prodotti_elimina.getSelectedItem().toString();
 			int cod = Integer.parseInt(codice.substring(codice.indexOf("(")+1,codice.length()-1));
 			
 			if (source.getLoginWindow().getDb().eliminaProdotto(cod))
@@ -140,13 +156,33 @@ public class DialogGestisciProdotto extends JPanel implements ActionListener {
 			
 			creaProdottiElimina();
 		}
+		
+		else if (e.getSource().equals(aggiungi_qta)) {
+			String codice = prodotti_aggiungi.getSelectedItem().toString();
+			int cod = Integer.parseInt(codice.substring(codice.indexOf("(")+1,codice.length()-1));
+			
+			if (source.getLoginWindow().getDb().aggiungiQtaProdotto(cod,Integer.parseInt(qta_aggiungi.getText())))
+				JOptionPane.showMessageDialog(null, "Quantità aggiunta", "Ok", JOptionPane.INFORMATION_MESSAGE);
+			else
+				JOptionPane.showMessageDialog(null, "Errore nell'aggiornamento", "Nope", JOptionPane.ERROR_MESSAGE);
+			
+			creaProdottiAggiungi();
+		}
 	}
 	
 	public void creaProdottiElimina() {
-		prodotti.removeAllItems();
+		prodotti_elimina.removeAllItems();
 		ArrayList<ArrayList<String>> prodotti = source.getLoginWindow().getDb().getProdotti();
 		for (ArrayList<String> prodotto: prodotti) {
-			this.prodotti.addItem( prodotto.get(Database.PRODOTTO_NOME-1) + "(" + prodotto.get(Database.PRODOTTO_COD-1) + ")" );
+			this.prodotti_elimina.addItem( prodotto.get(Database.PRODOTTO_NOME-1) + "(" + prodotto.get(Database.PRODOTTO_COD-1) + ")" );
+		}
+	}
+	
+	public void creaProdottiAggiungi() {
+		prodotti_aggiungi.removeAllItems();
+		ArrayList<ArrayList<String>> prodotti = source.getLoginWindow().getDb().getProdotti();
+		for (ArrayList<String> prodotto: prodotti) {
+			this.prodotti_aggiungi.addItem( prodotto.get(Database.PRODOTTO_NOME-1) + "(" + prodotto.get(Database.PRODOTTO_COD-1) + ")" );
 		}
 	}
 	

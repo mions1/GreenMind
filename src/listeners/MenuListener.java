@@ -23,12 +23,15 @@ public class MenuListener implements ActionListener {
 		int cibo_menu_size = source.getCibo().size();
 		int bevande_menu_size = source.getBevande().size();
 		int cannabis_menu_size = source.getCannabis().size();
-		int totale = 0;
+		float totale = 0;
 		String testo = "Riepilogo:\n";
 		ArrayList<ArrayList<String>> ordine = new ArrayList<ArrayList<String>>();
 		ArrayList<Integer> qta = new ArrayList<Integer>();
 		//Recupero l'ordine effettuato (prodotti e qta)
 		if (e.getSource().equals(source.getOrdina())) {
+			
+			int sconto = source.getLoginWindow().getDb().getSconto(source.getCf());
+			
 			//i va da 0 alla totalità dei prodotti presenti nel menu
 			for (int i = 0; i < cibo_menu_size+bevande_menu_size+cannabis_menu_size;i++) {
 				//Ogni prodotto lo aggiungo in ordine e la relativa qta in qta
@@ -37,12 +40,16 @@ public class MenuListener implements ActionListener {
 			}
 			for (int i = 0; i < ordine.size(); i++) 
 				if (qta.get(i) != 0) {
+					float prezzo = Float.parseFloat(ordine.get(i).get(Database.PRODOTTO_PREZZO-1))*qta.get(i);
+					String testo_sconto = sconto > 0 ? "(-"+sconto+"%)" : "";
 					testo = testo + 
 						ordine.get(i).get(Database.PRODOTTO_NOME-1) +
 						"    x" + qta.get(i) + ":    " +
-						Float.parseFloat(ordine.get(i).get(Database.PRODOTTO_PREZZO-1))*qta.get(i) + " €\n";
+						((prezzo*(100-sconto))/100) + " "+testo_sconto+" €\n";
 					totale += Float.parseFloat(ordine.get(i).get(Database.PRODOTTO_PREZZO-1))*qta.get(i);
+
 				}
+			totale = ((totale*(100-sconto))/100);
 			testo += "\nTotale: "+totale+" €";
 			source.showDialog(testo,ordine,qta);
 		}

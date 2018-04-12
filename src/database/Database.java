@@ -14,12 +14,20 @@ import java.util.Vector;
 
 public class Database {
 	
-	Connection c;
+	protected Connection c;
 	
 	//Usati per la funzione getProdotto per sapere che tipo di prodotto recupeare
 	public final static int MENU_CIBO = 1;
 	public final static int MENU_BEVANDE = 2;
 	public final static int MENU_CANNABIS = 3;
+	
+	//Ordine
+	public final static int ORDINE_COD = 1;
+	public final static int ORDINE_SCONTO = 2;
+	public final static int ORDINE_TAVOLO = 3;
+	public final static int ORDINE_CF = 4;
+	public final static int ORDINE_COD_TURNO = 5;
+	public final static int ORDINE_CONSEGNATO = 6;
 	
 	//Usati per sapere a quale indice della tabella si trovi cosa
 	public final static int PRODOTTO_COD = 1;
@@ -55,6 +63,20 @@ public class Database {
 		System.out.println("Opened database successfully");
 	}
 	
+	//Elimina lo schema e lo ricrea
+	public void deleteAll() {
+		try {
+			Statement stmt = c.createStatement();
+			String sql = "DROP SCHEMA public CASCADE;";
+			stmt.executeUpdate(sql);
+			sql = "CREATE SCHEMA public;";
+			stmt.executeUpdate(sql);
+			stmt.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * Crea le tabelle sul db
 	 * @return
@@ -65,6 +87,14 @@ public class Database {
 			Statement stmt = c.createStatement();
 			
 			String sql;
+			
+			//Creazione tabella bonus
+			sql = "CREATE TABLE IF NOT EXISTS bonus ("
+					+ "nome varchar primary key,"
+					+ "soglia integer not null,"
+					+ "sconto integer not null)";
+			stmt.executeUpdate(sql);
+			
 			//Creazione tabella Persona
 			sql = "CREATE TABLE IF NOT EXISTS persona ("
 					+ "cf varchar primary key,"
@@ -75,8 +105,12 @@ public class Database {
 					+ "stipendio real,"
 					+ "ruolo varchar,"
 					+ "s1 boolean,"
-					+ "s2 boolean)";
+					+ "s2 boolean,"
+					+ "cod_bonus varchar not null,"
+					+ "foreign key (cod_bonus) "
+					+ "references bonus(nome) )";
 			stmt.executeUpdate(sql);
+			
 			//Creazione tabella Evento
 			sql = "CREATE TABLE IF NOT EXISTS evento ("
 					+ "cod_evento SERIAL primary key,"
@@ -101,6 +135,7 @@ public class Database {
 			//Creazione tabella Ordina
 			sql = "CREATE TABLE IF NOT EXISTS ordina ("
 					+ "cod_ordine SERIAL primary key,"
+					+ "sconto integer not null,"
 					+ "tavolo integer not null,"
 					+ "cf varchar(16) not null,"
 					+ "cod_turno integer not null,"
@@ -140,6 +175,47 @@ public class Database {
 		return true;
 	}
 	
+	//Crea triggers
+	public void creaTriggers() {
+		try {
+			Statement stmt = c.createStatement();
+			//setBonus
+			String sql = "CREATE OR REPLACE FUNCTION add_bonus() " 
+					+ "RETURNS trigger AS\n"
+					+ "$BODY$\n"
+					+ "DECLARE\n"
+					+ "    nome_bonus varchar;\n"
+					+ "    spesa real;\n"
+					+ "	   cf_per varchar;\n"
+					+ "BEGIN\n"
+					+ "SELECT cf into cf_per FROM ordina,presenta where ordina.cod_ordine=presenta.cod_ordine;\n" 
+					+ "SELECT sum((presenta.qta*prodotto.prezzo)) into spesa from persona,prodotto,presenta,ordina "  
+					+ "WHERE presenta.cod_prodotto=prodotto.cod_prodotto "
+					+ "AND presenta.cod_ordine=ordina.cod_ordine " 
+					+ "AND ordina.cf=persona.cf AND persona.cf=cf_per;\n"
+					+ "SELECT nome INTO nome_bonus FROM bonus "
+					+ "WHERE soglia<spesa order by soglia desc limit 1;\n"
+					+ "UPDATE persona SET cod_bonus=nome_bonus "
+					+ "WHERE persona.cf=cf_per;\n" 
+					+ "RETURN null;\n" 
+					+ "END;\n"
+					+ "$BODY$\n"
+					+ "LANGUAGE plpgsql VOLATILE\n";
+			stmt.executeUpdate(sql);
+			
+			sql = "CREATE TRIGGER setBonus\n"
+					+ "  AFTER INSERT\n"
+					+ "  ON presenta\n" 
+					+ "  FOR EACH ROW\n" 
+					+ "  EXECUTE PROCEDURE add_bonus();"; 
+			stmt.executeUpdate(sql);
+			
+			stmt.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * Aggiunge una nuova persona nel db
 	 * @param cf
@@ -167,7 +243,7 @@ public class Database {
 					+ stipendio + ", '"
 					+ ruolo + "', "
 					+ dip +", "
-					+ cli + ")";
+					+ cli + ", 'base')";
 			prep = c.prepareStatement(sql);
 			prep.setDate(1, new Date(data.getTime().getTime()));
 			prep.executeUpdate();
@@ -273,6 +349,12 @@ public class Database {
 	public boolean valoriEsempio () {
 			Calendar cal = Calendar.getInstance();
 			
+			//Inserimento bonus
+			nuovoBonus("base", 0, 0);
+			nuovoBonus("bronzo", 50, 5);
+			nuovoBonus("argento", 150, 10);
+			nuovoBonus("oro", 250, 15);
+			
 			//Inserimento 3 clienti
 			cal.set(Calendar.YEAR, 1995);
 			cal.set(Calendar.MONTH, 10-1);
@@ -337,21 +419,26 @@ public class Database {
 		return true;
 	}
 
-	public Vector<String> recuperaMenu(int tipo) {
-		Vector<String> menu = new Vector<String>();
+	public ArrayList<ArrayList<String>> recuperaMenu(int tipo) {
+		ArrayList<ArrayList<String>> menu = new ArrayList<ArrayList<String>>();
 		try {
 			Statement stmt = c.createStatement();
 			String sql = "";
 			if (tipo == MENU_BEVANDE)
-				sql = "SELECT nome FROM prodotto WHERE S3=true";
+				sql = "SELECT * FROM prodotto WHERE S3=true";
 			else if (tipo == MENU_CIBO)
-				sql = "SELECT nome FROM prodotto WHERE S2=true";
+				sql = "SELECT * FROM prodotto WHERE S2=true";
 			else if (tipo == MENU_CANNABIS)
-				sql = "SELECT nome FROM prodotto WHERE S1=true";
+				sql = "SELECT * FROM prodotto WHERE S1=true";
 			
 			ResultSet res = stmt.executeQuery(sql);
-			while (res.next())
-				menu.add(res.getString(1));
+			ArrayList<String> prodotto;
+			while (res.next()) {
+				prodotto = new ArrayList<String>();
+				prodotto.add(res.getString(PRODOTTO_NOME));
+				prodotto.add( Integer.toString(res.getInt(PRODOTTO_QTA)));
+				menu.add(prodotto);
+			}
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -435,9 +522,9 @@ public class Database {
 			System.out.println("Aggiunta ordine");
 			Statement stmt = c.createStatement();
 			String sql = "";
-			
-			sql = "INSERT INTO ordina (tavolo,cf,cod_turno,consegnato) VALUES ("
-					+ tavolo + ",'"+cf+"', "+turno+", false) RETURNING cod_ordine";
+			int sconto = getSconto(cf);
+			sql = "INSERT INTO ordina (tavolo,cf,cod_turno,consegnato,sconto) VALUES ("
+					+ tavolo + ",'"+cf+"', "+turno+", false, "+sconto+") RETURNING cod_ordine";
 			ResultSet res = stmt.executeQuery(sql);
 			res.next();
 			cod_ordine = res.getInt(1);
@@ -503,6 +590,34 @@ public class Database {
 				turno.add(Integer.toString(res.getInt(1))); //Codice
 				turno.add((res.getDate(2).toString())); //Data
 				turno.add(Integer.toString(res.getInt(3))); //cod_evento
+				turni.add(turno);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return turni;
+	}
+	
+	/**
+	 * Restituisce i turni da una certa data in poi
+	 * @param data
+	 * @return
+	 */
+	public ArrayList<ArrayList<String>> getTurni(Calendar data) {
+		ArrayList<ArrayList<String>> turni = new ArrayList<ArrayList<String>>();
+		ArrayList<String> turno = new ArrayList<String>();
+		try {
+			PreparedStatement prep;
+			String sql = "SELECT cod_turno, data FROM turno where data>=?";
+			prep = c.prepareStatement(sql);
+			prep.setDate(1, new Date(data.getTime().getTime()));
+			ResultSet res = prep.executeQuery();
+			while (res.next()) {
+				turno = new ArrayList<>();
+				turno.add(Integer.toString(res.getInt(1))); //Codice
+				turno.add((res.getDate(2).toString())); //Data
 				turni.add(turno);
 			}
 		} catch (SQLException e) {
@@ -591,36 +706,6 @@ public class Database {
 	}
 	
 	/**
-	 * Restituisce tutti gli ordini
-	 */
-	public void getOrdine() {
-		//select nome from prodotto where cod_prodotto in (SELECT cod_prodotto from presenta where cod_ordine=(SELECT cod_ordine from ordina where cf='MNISMN95R05A341B'))
-		//CREATE VIEW TEMP ordini_cf AS SELECT * FROM ordina WHERE cf='' AND consegnato=false
-		//CREATE TEMP VIEW presenta_cf AS (SELECT cod_prodotto,presenta.cod_ordine,tavolo,cf,cod_turno,consegnato FROM presenta, ordini_cf WHERE presenta.cod_ordine=ordini_cf.cod_ordine)
-	}
-	
-	/**
-	 * Restituisce tutti gli ordini di un dato codice fiscale
-	 * @param cf codice fiscale
-	 */
-	public void getOrdine(String cf) {
-		//select nome from prodotto where cod_prodotto in (SELECT cod_prodotto from presenta where cod_ordine=(SELECT cod_ordine from ordina where cf='MNISMN95R05A341B'))
-		//CREATE VIEW TEMP ordini_cf AS SELECT * FROM ordina WHERE cf='' AND consegnato=false
-		//CREATE TEMP VIEW presenta_cf AS (SELECT cod_prodotto,presenta.cod_ordine,tavolo,cf,cod_turno,consegnato FROM presenta, ordini_cf WHERE presenta.cod_ordine=ordini_cf.cod_ordine)
-	}
-	
-	/**
-	 * Restituisce tutti gli ordini di un dato codice fiscale consegnati oppure no
-	 * @param cf codice fiscale
-	 * @param consegnato false per gli ordini non consegnati, true per tutti
-	 */
-	public void getOrdine(String cf, boolean consegnato) {
-		//select nome from prodotto where cod_prodotto in (SELECT cod_prodotto from presenta where cod_ordine=(SELECT cod_ordine from ordina where cf='MNISMN95R05A341B'))
-		//CREATE VIEW TEMP ordini_cf AS SELECT * FROM ordina WHERE cf='' AND consegnato=false
-		//CREATE TEMP VIEW presenta_cf AS (SELECT cod_prodotto,presenta.cod_ordine,tavolo,cf,cod_turno,consegnato FROM presenta, ordini_cf WHERE presenta.cod_ordine=ordini_cf.cod_ordine)
-	}
-	
-	/**
 	 * Restituisce tutti gli ordini di un dato tavolo, consegnati oppure no
 	 * @param tavolo tavolo
 	 * @param consegnato false per gli ordini non consegnati, true per tutti
@@ -643,7 +728,7 @@ public class Database {
 			
 			System.out.println("Creazione view2");
 			String ordini_presenta = "CREATE OR REPLACE TEMP VIEW ordini_presenta AS "
-					+ "SELECT presenta.cod_ordine, presenta.cod_prodotto, qta, tavolo, cf "
+					+ "SELECT presenta.cod_ordine, presenta.cod_prodotto, qta, tavolo, cf, sconto "
 					+ "FROM presenta,ordini_tavolo "
 					+ "where presenta.cod_ordine in "
 					+ "(SELECT cod_ordine from ordini_tavolo group by cod_ordine) "
@@ -652,13 +737,13 @@ public class Database {
 			System.out.println("OK!");
 			
 			System.out.println("Select ordini...");
-			String sql = "SELECT cod_ordine, nome, ordini_presenta.qta, tavolo, prezzo, cf "
+			String sql = "SELECT cod_ordine, nome, ordini_presenta.qta, tavolo, prezzo, cf, sconto "
 					+ "FROM prodotto, ordini_presenta "
 					+ "WHERE prodotto.cod_prodotto in "
 					+ "(SELECT cod_prodotto FROM ordini_presenta "
 					+ "group by cod_prodotto) "
 					+ "AND ordini_presenta.cod_prodotto=prodotto.cod_prodotto "
-					+ "group by cod_ordine, tavolo, cf, ordini_presenta.qta, nome, prezzo";
+					+ "group by cod_ordine, tavolo, cf, ordini_presenta.qta, nome, prezzo, sconto";
 			ResultSet res = stmt.executeQuery(sql);
 			System.out.println("OK!");
 			while (res.next()) {
@@ -669,6 +754,7 @@ public class Database {
 				ordine.add(Integer.toString(res.getInt(4)));	//tavolo
 				ordine.add(Float.toString(res.getFloat(5)));	//prezzo
 				ordine.add(res.getString(6));	//cf
+				ordine.add( Integer.toString(res.getInt(7)) );      //Sconto
 				ordini.add(ordine);
 			}
 			System.out.println(ordini);
@@ -840,6 +926,63 @@ public class Database {
 		}
 		
 		return tavoli;
+	}
+	
+	public boolean aggiungiQtaProdotto(int cod, int qta) {
+		try {
+			Statement stmt = c.createStatement();
+			String sql = "UPDATE prodotto set qta="+qta+" WHERE cod_prodotto="+cod;
+			stmt.executeUpdate(sql);
+			stmt.close();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public boolean nuovoBonus(String nome, int soglia, int sconto) {
+		try {
+			Statement stmt = c.createStatement();
+			String sql = "INSERT INTO bonus values('"+nome+"', "+soglia+", "+sconto+")";
+			stmt.executeUpdate(sql);
+			stmt.close();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public int getSconto(String cf) {
+		int sconto = 0;
+		try {
+			Statement stmt = c.createStatement();
+			String sql = "SELECT sconto FROM bonus,persona WHERE cod_bonus=bonus.nome AND persona.cf='"+cf+"'";
+			ResultSet res = stmt.executeQuery(sql);
+			res.next();
+			sconto = res.getInt(1);
+			System.out.println(sconto);
+			stmt.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return sconto;
+	}
+	
+	public boolean aggiungiEventoAlTurno(int cod_turno, int cod_evento) {
+		try {
+			Statement stmt = c.createStatement();
+			String sql = "UPDATE turno SET cod_evento="+cod_evento+" WHERE cod_turno="+cod_turno;
+			
+			stmt.executeUpdate(sql);
+			stmt.close();
+		} catch (SQLException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 	
 }

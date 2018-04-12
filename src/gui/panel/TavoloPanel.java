@@ -94,7 +94,8 @@ public class TavoloPanel extends JPanel {
 			}
 			ordine = ordini.get(i).get(1);	//Nome
 			ordine += " x"+ordini.get(i).get(2);//qta
-			ordine += " "+(Float.parseFloat(ordini.get(i).get(4))*Float.parseFloat(ordini.get(i).get(2))+"€");
+			float prezzo = Float.parseFloat(ordini.get(i).get(4))*Float.parseFloat(ordini.get(i).get(2));
+			ordine += " "+((prezzo*(100- Integer.parseInt(ordini.get(i).get(6)) ))/100)+"€";
 			ordine += "\n";
 			ordini_label.add(new JLabel(ordine));
 			System.out.println(ordine);

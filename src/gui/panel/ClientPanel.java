@@ -142,28 +142,30 @@ public class ClientPanel extends JPanel{
 	private void createMenu(Login_window lw) {
 		Database db = lw.getDb();
 		
-		Vector<String> cibo = db.recuperaMenu(db.MENU_CIBO);
-		Vector<String> bevande = db.recuperaMenu(db.MENU_BEVANDE);
-		Vector<String> cannabis = db.recuperaMenu(db.MENU_CANNABIS);
+		ArrayList<ArrayList<String>> cibo = db.recuperaMenu(db.MENU_CIBO);
+		ArrayList<ArrayList<String>> bevande = db.recuperaMenu(db.MENU_BEVANDE);
+		ArrayList<ArrayList<String>> cannabis = db.recuperaMenu(db.MENU_CANNABIS);
 		
 		for (int i = 0; i < cibo.size(); i++) {
-			menu_cibo.add(new JLabel(cibo.elementAt(i)));
-			qta.add(createQta());
+			menu_cibo.add(new JLabel(cibo.get(i).get(0)));
+			qta.add(createQta( Integer.parseInt(cibo.get(i).get(1))));
 		}
 		for (int i = 0; i < bevande.size(); i++) {
-			menu_bevande.add(new JLabel(bevande.elementAt(i)));
-			qta.add(createQta());
+			menu_bevande.add(new JLabel(bevande.get(i).get(0)));
+			qta.add(createQta(Integer.parseInt(bevande.get(i).get(1))));
 		}
 		for (int i = 0; i < cannabis.size(); i++) {
-			menu_cannabis.add(new JLabel(cannabis.elementAt(i)));
-			qta.add(createQta());
+			menu_cannabis.add(new JLabel(cannabis.get(i).get(0)));
+			qta.add(createQta(Integer.parseInt(cannabis.get(i).get(1))));
 		}
 				
 	}
 	
-	private JComboBox<Integer> createQta() {
+	private JComboBox<Integer> createQta(int max) {
 		JComboBox<Integer> qta = new JComboBox<Integer>();
-		for (int i=0; i < 10; i++)
+		ArrayList<ArrayList<String>> prodotti = lw.getDb().getProdotti();
+		
+		for (int i=0; i <= max; i++)
 			qta.addItem(i);
 		return qta;
 	}
@@ -172,6 +174,10 @@ public class ClientPanel extends JPanel{
 		return menu_cibo;
 	}
 
+	public String getCf() {
+		return cf;
+	}
+	
 	public ArrayList<JLabel> getBevande() {
 		return menu_bevande;
 	}

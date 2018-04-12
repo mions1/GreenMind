@@ -3,8 +3,12 @@ import java.util.Calendar;
 import database.Database;
 import gui.Login_window;
 import gui.panel.LoginPanel;
+import sun.font.CreatedFontTracker;
 
 /*
+ * 
+ * Vedi qualche dato derivato e tabella sulla quale fare indice
+ *
  */
 
 public class Main {
@@ -27,6 +31,8 @@ public class Main {
 		if (db.createTable())
 			System.out.println("OK!");
 		
+		//resetDb(db);
+		
 		Calendar turno = Database.getOggi();
 		
 		if (!db.setTurno(turno))
@@ -44,5 +50,12 @@ public class Main {
 		lw.setVisible(true);
 		System.out.println("OK!");
 		}
+	
+	public static void resetDb(Database db) {
+		db.deleteAll();
+		db.createTable();
+		db.valoriEsempio();
+		db.creaTriggers();
+	}
 
 }

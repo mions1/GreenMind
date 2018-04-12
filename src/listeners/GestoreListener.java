@@ -128,6 +128,8 @@ public class GestoreListener implements ActionListener {
 			source.setTable(nomi_colonne, risultati);
 		}
 		
+		
+		
 	}
 	
 }
