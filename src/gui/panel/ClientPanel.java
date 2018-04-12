@@ -134,7 +134,8 @@ public class ClientPanel extends JPanel{
 					qta_nuova.add(qta.get(i));
 				}
 			}
-			lw.getDb().addOrdine(tavolo, cf, cod_prod, qta_nuova, lw.getDb().getCod_turnoFromDate(Database.getOggi()));
+			lw.getDb().nuovoOrdine(tavolo, cf, cod_prod, qta_nuova, lw.getDb().getCod_turnoFromDate(Database.getOggi()));
+			createMenu(lw);
 		}
 			
 	}
@@ -142,9 +143,9 @@ public class ClientPanel extends JPanel{
 	private void createMenu(Login_window lw) {
 		Database db = lw.getDb();
 		
-		ArrayList<ArrayList<String>> cibo = db.recuperaMenu(db.MENU_CIBO);
-		ArrayList<ArrayList<String>> bevande = db.recuperaMenu(db.MENU_BEVANDE);
-		ArrayList<ArrayList<String>> cannabis = db.recuperaMenu(db.MENU_CANNABIS);
+		ArrayList<ArrayList<String>> cibo = db.getMenu(db.MENU_CIBO);
+		ArrayList<ArrayList<String>> bevande = db.getMenu(db.MENU_BEVANDE);
+		ArrayList<ArrayList<String>> cannabis = db.getMenu(db.MENU_CANNABIS);
 		
 		for (int i = 0; i < cibo.size(); i++) {
 			menu_cibo.add(new JLabel(cibo.get(i).get(0)));

@@ -11,17 +11,24 @@ import java.util.Calendar;
 import java.util.Vector;
 
 
-
+/**
+ * La classe si occupa di gesire il database, gestisce la creazione
+ * delle tabelle, aggiunta dei record ed eliminazione ed altre utili
+ * query per la gestione del locale.
+ *
+ */
 public class Database {
 	
 	protected Connection c;
 	
-	//Usati per la funzione getProdotto per sapere che tipo di prodotto recupeare
+	//QUANDO SI USANO QUESTE COSTANTI NEGLI ARRAYLIST VANNO USATI CON -1
+	
+	//Per getProdotto
 	public final static int MENU_CIBO = 1;
 	public final static int MENU_BEVANDE = 2;
 	public final static int MENU_CANNABIS = 3;
 	
-	//Ordine
+	//Per getOrdine
 	public final static int ORDINE_COD = 1;
 	public final static int ORDINE_SCONTO = 2;
 	public final static int ORDINE_TAVOLO = 3;
@@ -29,7 +36,7 @@ public class Database {
 	public final static int ORDINE_COD_TURNO = 5;
 	public final static int ORDINE_CONSEGNATO = 6;
 	
-	//Usati per sapere a quale indice della tabella si trovi cosa
+	//Tabella Prodotto
 	public final static int PRODOTTO_COD = 1;
 	public final static int PRODOTTO_IS_CANNABIS = 2;
 	public final static int PRODOTTO_IS_CIBO = 3;
@@ -41,29 +48,31 @@ public class Database {
 	public final static int PRODOTTO_PREZZO = 9;
 	
 	
-	//EVENTO
+	//Tabella Prodotto
 	public final static int EVENTO_COD = 1;
 	public final static int EVENTO_NOME = 2;
 	public final static int EVENTO_TIPO = 3;
 	
 	/**
-	 * Stabilisce la connessione con il database
+	 * Stabilisce la connessione con il database GreenMind in localhost
 	 */
 	public Database () {
 		c = null;
+		
 		try {
         Class.forName("org.postgresql.Driver");
         c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/GreenMind", 
         		"postgres", "mions95");
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.err.println(e.getClass().getName()+": "+e.getMessage());
-			System.exit(0);
 		}
-		System.out.println("Opened database successfully");
 	}
 	
-	//Elimina lo schema e lo ricrea
+	//-----------------GESTIONE DB, SCHEMA, TABELLE, TRIGGERS e VALORI DI ESEMPIO--------------
+	
+	/**
+	 * Elimina lo schema e lo ricrea
+	 */
 	public void deleteAll() {
 		try {
 			Statement stmt = c.createStatement();
@@ -79,7 +88,7 @@ public class Database {
 	
 	/**
 	 * Crea le tabelle sul db
-	 * @return
+	 * @return true se tutto è andato bene, false altrimenti
 	 */
 	public boolean createTable() {
 		
@@ -175,7 +184,9 @@ public class Database {
 		return true;
 	}
 	
-	//Crea triggers
+	/**
+	 * Crea Triggers sul db
+	 */
 	public void creaTriggers() {
 		try {
 			Statement stmt = c.createStatement();
@@ -217,134 +228,8 @@ public class Database {
 	}
 	
 	/**
-	 * Aggiunge una nuova persona nel db
-	 * @param cf
-	 * @param nome
-	 * @param cognome
-	 * @param data
-	 * @param nazione
-	 * @param stipendio
-	 * @param ruolo
-	 * @param dip
-	 * @param cli
-	 * @return
-	 */
-	public boolean nuovaPersona(String cf, String nome, String cognome, Calendar data, String nazione, float stipendio, String ruolo, boolean dip, boolean cli) {
-		try {
-			PreparedStatement prep;
-			stipendio = !dip ? 0 : stipendio;
-			ruolo = !dip ? null : ruolo;
-			String sql = "INSERT INTO persona VALUES ("
-					+ "'" + cf +"'" + ", "
-					+ "'" + nome + "'" + ", "
-					+ "'" + cognome + "'" + ", "
-					+ "?" + ", "
-					+ "'" + nazione + "'" + ", "
-					+ stipendio + ", '"
-					+ ruolo + "', "
-					+ dip +", "
-					+ cli + ", 'base')";
-			prep = c.prepareStatement(sql);
-			prep.setDate(1, new Date(data.getTime().getTime()));
-			prep.executeUpdate();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return true;
-	}
-
-	/**
-	 * Seleziona tutte le persone registrate nel db
-	 * @param dipendente true se si vogliono anche i dipendenti
-	 * @param cliente true se si vogliono anche i clienti
-	 * @return
-	 */
-	public ArrayList<String> getPersone(boolean dipendente, boolean cliente) {
-		ArrayList<String> cfs = new ArrayList<String>();
-		try {
-			Statement stmt = c.createStatement();
-			String sql = "SELECT cf FROM persona WHERE s2="+cliente+" OR s1="+dipendente;
-			ResultSet res = stmt.executeQuery(sql);
-			
-			while (res.next()) {
-				cfs.add(res.getString(1));
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return cfs;
-	}
-	
-	/**
-	 * Verifica se esiste un cliente con il dato cf
-	 * @param cf
-	 * @return
-	 */
-	public boolean loginCliente(String cf) {
-		Statement stmt;
-		try {
-			stmt = c.createStatement();
-			String sql = "SELECT * FROM persona WHERE s2=true AND cf='"+cf+"'";
-			ResultSet res = stmt.executeQuery(sql);
-			if (res.next())
-				return true;
-			return false;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return false;
-	}
-	
-	/**
-	 * Verifica se esiste un cameriere col dato cf
-	 * @param cf
-	 * @return
-	 */
-	public boolean loginCameriere(String cf) {
-		Statement stmt;
-		try {
-			stmt = c.createStatement();
-			String sql = "SELECT * FROM persona WHERE s1=true AND cf='"+cf+"' AND ruolo='cameriere'";
-			ResultSet res = stmt.executeQuery(sql);
-			if (res.next())
-				return true;
-			return false;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return false;
-	}
-	
-	/**
-	 * Verifica se esiste un gestore col dato cf
-	 * @param cf
-	 * @return
-	 */
-	public boolean loginGestore(String cf) {
-		Statement stmt;
-		try {
-			stmt = c.createStatement();
-			String sql = "SELECT * FROM persona WHERE s2=true AND cf='"+cf+"'";
-			ResultSet res = stmt.executeQuery(sql);
-			if (res.next())
-				return true;
-			return false;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return false;
-	}
-
-	/**
 	 * Aggiunta valori di esempio
-	 * @return
+	 * @return true se è andato tutto bene, false altrimenti
 	 */
 	public boolean valoriEsempio () {
 			Calendar cal = Calendar.getInstance();
@@ -419,99 +304,63 @@ public class Database {
 		return true;
 	}
 
-	public ArrayList<ArrayList<String>> recuperaMenu(int tipo) {
-		ArrayList<ArrayList<String>> menu = new ArrayList<ArrayList<String>>();
-		try {
-			Statement stmt = c.createStatement();
-			String sql = "";
-			if (tipo == MENU_BEVANDE)
-				sql = "SELECT * FROM prodotto WHERE S3=true";
-			else if (tipo == MENU_CIBO)
-				sql = "SELECT * FROM prodotto WHERE S2=true";
-			else if (tipo == MENU_CANNABIS)
-				sql = "SELECT * FROM prodotto WHERE S1=true";
-			
-			ResultSet res = stmt.executeQuery(sql);
-			ArrayList<String> prodotto;
-			while (res.next()) {
-				prodotto = new ArrayList<String>();
-				prodotto.add(res.getString(PRODOTTO_NOME));
-				prodotto.add( Integer.toString(res.getInt(PRODOTTO_QTA)));
-				menu.add(prodotto);
-			}
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return menu;
-	}
-
-	public ArrayList<String>  getProdotto (String nome) {
-		ArrayList<String> prodotto = new ArrayList<String>();
-		try {
-			Statement stmt = c.createStatement();
-			String sql = "SELECT * FROM prodotto WHERE nome='"+nome+"'";
-			ResultSet res = stmt.executeQuery(sql);
-			
-			while (res.next()) {
-				prodotto.add(Integer.toString(res.getInt(1))); //Codice
-				prodotto.add(Boolean.toString(res.getBoolean(2))); //S1 (cannabis)
-				prodotto.add(Boolean.toString(res.getBoolean(3))); //S2 (cibo)
-				prodotto.add(Boolean.toString(res.getBoolean(4))); //S3 (Bevande)
-				prodotto.add(Integer.toString(res.getInt(5))); //qta
-				prodotto.add(res.getString(6)); //nome
-				prodotto.add(res.getString(7)); //scheda
-				prodotto.add(res.getString(8)); //tipo
-				prodotto.add(Float.toString(res.getFloat(9))); //prezzo		
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return prodotto;
-	}
+	//-------------------------------------------------------------------------------------------
 	
-	public ArrayList<ArrayList<String>> getProdotti() {
-		ArrayList<ArrayList<String>> prodotti = new ArrayList<ArrayList<String>>();
-		try {
-			Statement stmt = c.createStatement();
-			String sql = "SELECT * FROM prodotto";
-			ResultSet res = stmt.executeQuery(sql);
-			ArrayList<String> prodotto;
-			while (res.next()) {
-				prodotto = new ArrayList<String>();
-				prodotto.add(Integer.toString(res.getInt(1))); //Codice
-				prodotto.add(Boolean.toString(res.getBoolean(2))); //S1 (cannabis)
-				prodotto.add(Boolean.toString(res.getBoolean(3))); //S2 (cibo)
-				prodotto.add(Boolean.toString(res.getBoolean(4))); //S3 (Bevande)
-				prodotto.add(Integer.toString(res.getInt(5))); //qta
-				prodotto.add(res.getString(6)); //nome
-				prodotto.add(res.getString(7)); //scheda
-				prodotto.add(res.getString(8)); //tipo
-				prodotto.add(Float.toString(res.getFloat(9))); //prezzo
-				prodotti.add(prodotto);
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return prodotti;
-	}
+	//----------------------------------AGGIUNTA RECORD NELLE TABELLE----------------------------
 	
 	/**
-	 * Aggiunta di un ordine.
-	 * Ovviamente aggiungera anche i record delle relazioni n-n
-	 * e rimuove i prodotti dalla qta totale
-	 * @param tavolo
-	 * @param cf
-	 * @param cod_prod
-	 * @param qta
-	 * @param turno
-	 * @return
+	 * Aggiunta di una persona
+	 * @param cf codice fiscale
+	 * @param nome nome
+	 * @param cognome cognome
+	 * @param data data di nascità
+	 * @param nazione nazionalità
+	 * @param stipendio stipendio nel caso sia un dipendente
+	 * @param ruolo ruole del dipendente
+	 * @param dip true se è un dipendente
+	 * @param cli true se è un cliente
+	 * @return true se è andato bene, false altrimenti
 	 */
-	public boolean addOrdine(int tavolo,String cf, ArrayList<Integer> cod_prod, ArrayList<Integer> qta, int turno) {
+	public boolean nuovaPersona(String cf, String nome, String cognome, Calendar data, String nazione, float stipendio, String ruolo, boolean dip, boolean cli) {
+		try {
+			PreparedStatement prep;
+			stipendio = !dip ? 0 : stipendio;
+			ruolo = !dip ? null : ruolo;
+			String sql = "INSERT INTO persona VALUES ("
+					+ "'" + cf +"'" + ", "
+					+ "'" + nome + "'" + ", "
+					+ "'" + cognome + "'" + ", "
+					+ "?" + ", "
+					+ "'" + nazione + "'" + ", "
+					+ stipendio + ", '"
+					+ ruolo + "', "
+					+ dip +", "
+					+ cli + ", 'base')";
+			prep = c.prepareStatement(sql);
+			prep.setDate(1, new Date(data.getTime().getTime()));
+			prep.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
+		return true;
+	}
+
+	/**
+	 * Aggiunta di un ordine.
+	 * Ovviamente aggiungera anche i record delle relazioni n-n (presenta)
+	 * ed aggiorna la qta dei prodotti ordinati
+	 * @param tavolo tavolo dell'ordine 
+	 * @param cf codice fiscale dell'ordinante
+	 * @param cod_prod prodotti ordinati
+	 * @param qta qta dei prodotti ordinati
+	 * @param turno turno nel quale si è effettuato l'ordine
+	 * @return true se è andato bene, false altrimenti
+	 */
+	public boolean nuovoOrdine(int tavolo,String cf, ArrayList<Integer> cod_prod, ArrayList<Integer> qta, int turno) {
+		
+		//Se il turno non esiste
 		if (turno == -1) 
 			return false;
 		
@@ -575,8 +424,233 @@ public class Database {
 	}
 	
 	/**
-	 * Restituisce i turni inseriti
+	 * Aggiunta di un turno
+	 * @param turno data del turno da inserire
+	 * @return true se tutto bene, false altrimenti
+	 */
+	public boolean nuovoTurno(Calendar turno) {
+		
+		try {
+			PreparedStatement prep;
+			ArrayList<ArrayList<String>> turni = getTurni();
+			String data = "";
+			data = Integer.toString(turno.get(Calendar.YEAR));
+			if (turno.get(Calendar.MONTH)+1 < 10)
+				data += "-0"+Integer.toString(turno.get(Calendar.MONTH)+1);
+			else
+				data += "-0"+Integer.toString(turno.get(Calendar.MONTH)+1);
+			data += "-"+Integer.toString(turno.get(Calendar.DAY_OF_MONTH));
+			
+			//Se la data già c'è non aggiunge il turno
+			for (int i=0; i<turni.size(); i++) {
+				if (turni.get(i).get(1).toString().equals(data)) {
+					return false;
+				}
+			}
+			
+			String sql = "INSERT INTO turno (data, cod_evento) VALUES ("
+					+ "?, null)";
+			prep = c.prepareStatement(sql);
+			prep.setDate(1, new Date(turno.getTime().getTime()));
+			prep.executeUpdate();
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		}
+		return true;
+	}
+	
+	/**
+	 * Aggiunta di un prodotto
+	 * @param nome nome prodotto
+	 * @param scheda scheda (informazioni di cosa è)
+	 * @param tipo tipo (vegetariano etc)
+	 * @param qta qta in magazzino del prodotto
+	 * @param prezzo prezzo del prodotto
+	 * @param cannabis true se il prodotto è cannabis
+	 * @param cibo true se il prodotto è cibo
+	 * @param bevanda true se il prodotto è bevanda
+	 * @return true se tutto è andato bene, false altrimenti
+	 */
+	public boolean nuovoProdotto(String nome, String scheda, String tipo, int qta, float prezzo, boolean cannabis, boolean cibo, boolean bevanda) {
+		try {
+			Statement stmt = c.createStatement();
+			String sql = "INSERT INTO prodotto(S1,S2,S3,nome,scheda,tipo,qta,prezzo) "
+					+ "VALUES("+cannabis+", "+cibo+", "
+							+ bevanda+", '"+nome+"', '"
+							+scheda+"', '"+tipo+"', "
+							+qta+", "+prezzo+")";
+			stmt.executeUpdate(sql);
+			stmt.close();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
+	 * Aggiunta di un evento
+	 * @param nome nome dell'evento
+	 * @param tipo tipo dell'evento
+	 * @return true se è andato bene, false altrimenti
+	 */
+	public boolean nuovoEvento(String nome, String tipo) {
+		try {
+			Statement stmt = c.createStatement();
+			String sql = "INSERT INTO evento(nome,tipo) "
+					+ "VALUES('"+nome+"', '"+tipo+"')";
+			stmt.executeUpdate(sql);
+			stmt.close();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
+	 * Aggiunta del bonus
+	 * @param nome nome del bonus (argento, oro etc)
+	 * @param soglia spesa che bisogna effettuare per raggiungere il bonus
+	 * @param sconto quanto sconto si ha diritto (10 = 10%)
 	 * @return
+	 */
+	public boolean nuovoBonus(String nome, int soglia, int sconto) {
+		try {
+			Statement stmt = c.createStatement();
+			String sql = "INSERT INTO bonus values('"+nome+"', "+soglia+", "+sconto+")";
+			stmt.executeUpdate(sql);
+			stmt.close();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	//------------------------------------RECUPERO RECORDS----------------------------------------
+
+	/**
+	 * Seleziona tutte le persone registrate nel db
+	 * @param dipendente true se si vogliono anche i dipendenti
+	 * @param cliente true se si vogliono anche i clienti
+	 * @return lista delle persone che soddisfano i suddetti predicati
+	 */
+	public ArrayList<String> getPersone(boolean dipendente, boolean cliente) {
+		ArrayList<String> cfs = new ArrayList<String>();
+		try {
+			Statement stmt = c.createStatement();
+			String sql = "SELECT cf FROM persona WHERE s2="+cliente+" OR s1="+dipendente;
+			ResultSet res = stmt.executeQuery(sql);
+			
+			while (res.next()) {
+				cfs.add(res.getString(1));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return cfs;
+	}
+	
+	/**
+	 * Recupero dei prodotti di un dato tipo
+	 * @param tipo tipo dei prodotti da recuperare (MENU_CANNABIS, etc)
+	 * @return lista dei prodotti del tipo scelto
+	 */
+	public ArrayList<ArrayList<String>> getMenu(int tipo) {
+		ArrayList<ArrayList<String>> menu = new ArrayList<ArrayList<String>>();
+		try {
+			Statement stmt = c.createStatement();
+			String sql = "";
+			if (tipo == MENU_BEVANDE)
+				sql = "SELECT * FROM prodotto WHERE S3=true";
+			else if (tipo == MENU_CIBO)
+				sql = "SELECT * FROM prodotto WHERE S2=true";
+			else if (tipo == MENU_CANNABIS)
+				sql = "SELECT * FROM prodotto WHERE S1=true";
+			
+			ResultSet res = stmt.executeQuery(sql);
+			ArrayList<String> prodotto;
+			while (res.next()) {
+				prodotto = new ArrayList<String>();
+				prodotto.add(res.getString(PRODOTTO_NOME));
+				prodotto.add( Integer.toString(res.getInt(PRODOTTO_QTA)));
+				menu.add(prodotto);
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return menu;
+	}
+
+	/**
+	 * Recupero di un prodotto dato il nome
+	 * @param nome prodotto da recuperare
+	 * @return lista dei campi del prodotto scelto
+	 */
+	public ArrayList<String>  getProdotto (String nome) {
+		ArrayList<String> prodotto = new ArrayList<String>();
+		try {
+			Statement stmt = c.createStatement();
+			String sql = "SELECT * FROM prodotto WHERE nome='"+nome+"'";
+			ResultSet res = stmt.executeQuery(sql);
+			
+			while (res.next()) {
+				prodotto.add(Integer.toString(res.getInt(1))); //Codice
+				prodotto.add(Boolean.toString(res.getBoolean(2))); //S1 (cannabis)
+				prodotto.add(Boolean.toString(res.getBoolean(3))); //S2 (cibo)
+				prodotto.add(Boolean.toString(res.getBoolean(4))); //S3 (Bevande)
+				prodotto.add(Integer.toString(res.getInt(5))); //qta
+				prodotto.add(res.getString(6)); //nome
+				prodotto.add(res.getString(7)); //scheda
+				prodotto.add(res.getString(8)); //tipo
+				prodotto.add(Float.toString(res.getFloat(9))); //prezzo		
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return prodotto;
+	}
+	
+	/**
+	 * Recupero dei prodotti nel db
+	 * @return lista dei prodotti
+	 */
+	public ArrayList<ArrayList<String>> getProdotti() {
+		ArrayList<ArrayList<String>> prodotti = new ArrayList<ArrayList<String>>();
+		try {
+			Statement stmt = c.createStatement();
+			String sql = "SELECT * FROM prodotto";
+			ResultSet res = stmt.executeQuery(sql);
+			ArrayList<String> prodotto;
+			while (res.next()) {
+				prodotto = new ArrayList<String>();
+				prodotto.add(Integer.toString(res.getInt(1))); //Codice
+				prodotto.add(Boolean.toString(res.getBoolean(2))); //S1 (cannabis)
+				prodotto.add(Boolean.toString(res.getBoolean(3))); //S2 (cibo)
+				prodotto.add(Boolean.toString(res.getBoolean(4))); //S3 (Bevande)
+				prodotto.add(Integer.toString(res.getInt(5))); //qta
+				prodotto.add(res.getString(6)); //nome
+				prodotto.add(res.getString(7)); //scheda
+				prodotto.add(res.getString(8)); //tipo
+				prodotto.add(Float.toString(res.getFloat(9))); //prezzo
+				prodotti.add(prodotto);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return prodotti;
+	}
+	
+	/**
+	 * Restituisce i turni inseriti
+	 * @return lista dei turni nel db
 	 */
 	public ArrayList<ArrayList<String>> getTurni() {
 		ArrayList<ArrayList<String>> turni = new ArrayList<ArrayList<String>>();
@@ -602,7 +676,7 @@ public class Database {
 	
 	/**
 	 * Restituisce i turni da una certa data in poi
-	 * @param data
+	 * @param data data dalla quale partire
 	 * @return
 	 */
 	public ArrayList<ArrayList<String>> getTurni(Calendar data) {
@@ -630,7 +704,7 @@ public class Database {
 	
 	/**
 	 * Restituisce il codice di un turno nella data richiesta
-	 * @param data
+	 * @param data data richiesta
 	 * @return
 	 */
 	public int getCod_turnoFromDate(Calendar data) {
@@ -650,65 +724,57 @@ public class Database {
 	}
 	
 	/**
-	 * Aggiunta di un nuovo turno che abbia come data quella richiesta
-	 * @param turno
-	 * @return
+	 * Restituisce gli eventi inseriti nel db
+	 * @return lista degli eventi
 	 */
-	public boolean setTurno(Calendar turno) {
-		
+	public ArrayList<ArrayList<String>> getEventi() {
+		ArrayList<ArrayList<String>> eventi = new ArrayList<ArrayList<String>>();
+		ArrayList<String> evento = new ArrayList<String>();
 		try {
-			PreparedStatement prep;
-			ArrayList<ArrayList<String>> turni = getTurni();
-			String data = "";
-			data = Integer.toString(turno.get(Calendar.YEAR));
-			if (turno.get(Calendar.MONTH)+1 < 10)
-				data += "-0"+Integer.toString(turno.get(Calendar.MONTH)+1);
-			else
-				data += "-0"+Integer.toString(turno.get(Calendar.MONTH)+1);
-			data += "-"+Integer.toString(turno.get(Calendar.DAY_OF_MONTH));
-			
-			for (int i=0; i<turni.size(); i++) {
-				if (turni.get(i).get(1).toString().equals(data)) {
-					return false;
-				}
+			Statement stmt = c.createStatement();
+			String sql = "SELECT * FROM evento";
+			ResultSet res = stmt.executeQuery(sql);
+			while (res.next()) {
+				evento = new ArrayList<>();
+				evento.add(Integer.toString(res.getInt(EVENTO_COD))); //Codice
+				evento.add(res.getString(EVENTO_NOME)); //Nome
+				evento.add(res.getString(EVENTO_TIPO)); //TIPO
+				eventi.add(evento);
 			}
-			
-			String sql = "INSERT INTO turno (data, cod_evento) VALUES ("
-					+ "?, null)";
-			prep = c.prepareStatement(sql);
-			prep.setDate(1, new Date(turno.getTime().getTime()));
-			prep.executeUpdate();
 		} catch (SQLException e) {
-			System.err.println(e.getMessage());
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		return true;
 		
-	}
-
-	/**
-	 * Restituisce il giorno attuale (usata per inserire il turno odierno)
-	 * @return
-	 */
-	public static Calendar getOggi() {
-		Calendar turno = Calendar.getInstance();
-		turno.set(Calendar.YEAR, turno.get(Calendar.YEAR));
-		turno.set(Calendar.MONTH, turno.get(Calendar.MONTH));
-		turno.set(Calendar.DATE, turno.get(Calendar.DAY_OF_MONTH));
-		return turno;
+		return eventi;
 	}
 	
-	public static Calendar creaData(int anno, int mese, int giorno) {
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, anno);
-		cal.set(Calendar.MONTH, mese-1);
-		cal.set(Calendar.DATE, giorno);
-		return cal;
+	/**
+	 * Restitusce lo sconto di cui ha diritto una persona
+	 * @param cf cf della persona di cui prendere lo sconto
+	 * @return lo sconto da applicare
+	 */
+	public int getSconto(String cf) {
+		int sconto = 0;
+		try {
+			Statement stmt = c.createStatement();
+			String sql = "SELECT sconto FROM bonus,persona WHERE cod_bonus=bonus.nome AND persona.cf='"+cf+"'";
+			ResultSet res = stmt.executeQuery(sql);
+			res.next();
+			sconto = res.getInt(1);
+			System.out.println(sconto);
+			stmt.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return sconto;
 	}
 	
 	/**
 	 * Restituisce tutti gli ordini di un dato tavolo, consegnati oppure no
 	 * @param tavolo tavolo
 	 * @param consegnato false per gli ordini non consegnati, true per tutti
+	 * @return lista degli ordini del tavolo
 	 */
 	public ArrayList<ArrayList<String>> getOrdine(int tavolo, boolean consegnato) {
 		
@@ -765,6 +831,176 @@ public class Database {
 		return ordini;
 	}
 	
+	//------------------------------------ELIMINA RECORD-----------------------------
+	
+	/**
+	 * Elimina un ordine col tale codice
+	 * @param cod_ordine cod dell'ordine da eliminare
+	 * @return true se è stato eliminato
+	 */
+	public boolean eliminaOrdine(int cod_ordine) {
+		System.out.println("Elimina ordine...");
+		try {
+			Statement stmt = c.createStatement();
+			String sql = "DELETE FROM ordina where cod_ordine="+cod_ordine;
+			stmt.executeUpdate(sql);
+			stmt.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("OK!");
+		return true;
+	}
+	
+	/**
+	 * Elimina una persona col tale cf
+	 * @param cf cf della persona da eliminare
+	 * @return true se è andato tutto bene, false altrimenti
+	 */
+	public boolean eliminaPersona(String cf) {
+		try {
+			Statement stmt = c.createStatement();
+			String sql = "DELETE FROM PERSONA WHERE cf='"+cf+"'";
+			stmt.executeUpdate(sql);
+			stmt.close();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
+	 * Elimina un prodotto col tale codice
+	 * @param cod codice prodotto da eliminare
+	 * @return true se è andato tutto bene false altrimenti
+	 */
+	public boolean eliminaProdotto(int cod) {
+		try {
+			Statement stmt = c.createStatement();
+			String sql = "DELETE FROM prodotto WHERE cod_prodotto="+cod;
+			stmt.executeUpdate(sql);
+			stmt.close();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
+	 * Elimina evento col tale codice
+	 * @param cod codice evento da eliminare
+	 * @return true se è andato tutto bene false altrimenti
+	 */
+	public boolean eliminaEvento(int cod) {
+		try {
+			Statement stmt = c.createStatement();
+			String sql = "DELETE FROM evento WHERE cod_evento="+cod;
+			stmt.executeUpdate(sql);
+			stmt.close();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	//-----------------------------------------ALTRO------------------------------------
+	
+	/**
+	 * Verifica se esiste un cliente con il dato cf
+	 * @param cf
+	 * @return
+	 */
+	public boolean loginCliente(String cf) {
+		Statement stmt;
+		try {
+			stmt = c.createStatement();
+			String sql = "SELECT * FROM persona WHERE s2=true AND cf='"+cf+"'";
+			ResultSet res = stmt.executeQuery(sql);
+			if (res.next())
+				return true;
+			return false;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	/**
+	 * Verifica se esiste un cameriere col dato cf
+	 * @param cf
+	 * @return
+	 */
+	public boolean loginCameriere(String cf) {
+		Statement stmt;
+		try {
+			stmt = c.createStatement();
+			String sql = "SELECT * FROM persona WHERE s1=true AND cf='"+cf+"' AND ruolo='cameriere'";
+			ResultSet res = stmt.executeQuery(sql);
+			if (res.next())
+				return true;
+			return false;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	/**
+	 * Verifica se esiste un gestore col dato cf
+	 * @param cf
+	 * @return
+	 */
+	public boolean loginGestore(String cf) {
+		Statement stmt;
+		try {
+			stmt = c.createStatement();
+			String sql = "SELECT * FROM persona WHERE s2=true AND cf='"+cf+"'";
+			ResultSet res = stmt.executeQuery(sql);
+			if (res.next())
+				return true;
+			return false;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+
+	/**
+	 * Restituisce il giorno attuale (usata per inserire il turno odierno)
+	 * @return
+	 */
+	public static Calendar getOggi() {
+		Calendar turno = Calendar.getInstance();
+		turno.set(Calendar.YEAR, turno.get(Calendar.YEAR));
+		turno.set(Calendar.MONTH, turno.get(Calendar.MONTH));
+		turno.set(Calendar.DATE, turno.get(Calendar.DAY_OF_MONTH));
+		return turno;
+	}
+	
+	/**
+	 * Crea la data nel formato calendar
+	 * @param anno 
+	 * @param mese
+	 * @param giorno
+	 * @return
+	 */
+	public static Calendar creaData(int anno, int mese, int giorno) {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.YEAR, anno);
+		cal.set(Calendar.MONTH, mese-1);
+		cal.set(Calendar.DATE, giorno);
+		return cal;
+	}
+	
+	
 	/**
 	 * Modifica un ordine per impostarlo come consegnato
 	 * @param consegnato
@@ -786,21 +1022,11 @@ public class Database {
 		return true;
 	}
 	
-	public boolean eliminaOrdine(int cod_ordine) {
-		System.out.println("Elimina ordine...");
-		try {
-			Statement stmt = c.createStatement();
-			String sql = "DELETE FROM ordina where cod_ordine="+cod_ordine;
-			stmt.executeUpdate(sql);
-			stmt.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("OK!");
-		return true;
-	}
-	
+	/**
+	 * Esegue la query passata
+	 * @param query query da eseguire
+	 * @return il risultato della query
+	 */
 	public ResultSet eseguiQuery(String query) {
 		ResultSet res = null;
 		System.out.println("Eseguo query...");
@@ -814,101 +1040,9 @@ public class Database {
 		return res;
 	}
 	
-	public boolean eliminaPersona(String cf) {
-		try {
-			Statement stmt = c.createStatement();
-			String sql = "DELETE FROM PERSONA WHERE cf='"+cf+"'";
-			stmt.executeUpdate(sql);
-			stmt.close();
-			return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-	
-	public boolean eliminaProdotto(int cod) {
-		try {
-			Statement stmt = c.createStatement();
-			String sql = "DELETE FROM prodotto WHERE cod_prodotto="+cod;
-			stmt.executeUpdate(sql);
-			stmt.close();
-			return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-	
-	public boolean nuovoProdotto(String nome, String scheda, String tipo, int qta, float prezzo, boolean cannabis, boolean cibo, boolean bevanda) {
-		try {
-			Statement stmt = c.createStatement();
-			String sql = "INSERT INTO prodotto(S1,S2,S3,nome,scheda,tipo,qta,prezzo) "
-					+ "VALUES("+cannabis+", "+cibo+", "
-							+ bevanda+", '"+nome+"', '"
-							+scheda+"', '"+tipo+"', "
-							+qta+", "+prezzo+")";
-			stmt.executeUpdate(sql);
-			stmt.close();
-			return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-	
-	public ArrayList<ArrayList<String>> getEventi() {
-		ArrayList<ArrayList<String>> eventi = new ArrayList<ArrayList<String>>();
-		ArrayList<String> evento = new ArrayList<String>();
-		try {
-			Statement stmt = c.createStatement();
-			String sql = "SELECT * FROM evento";
-			ResultSet res = stmt.executeQuery(sql);
-			while (res.next()) {
-				evento = new ArrayList<>();
-				evento.add(Integer.toString(res.getInt(EVENTO_COD))); //Codice
-				evento.add(res.getString(EVENTO_NOME)); //Nome
-				evento.add(res.getString(EVENTO_TIPO)); //TIPO
-				eventi.add(evento);
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return eventi;
-	}
-	
-	public boolean nuovoEvento(String nome, String tipo) {
-		try {
-			Statement stmt = c.createStatement();
-			String sql = "INSERT INTO evento(nome,tipo) "
-					+ "VALUES('"+nome+"', '"+tipo+"')";
-			stmt.executeUpdate(sql);
-			stmt.close();
-			return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-	
-	public boolean eliminaEvento(int cod) {
-		try {
-			Statement stmt = c.createStatement();
-			String sql = "DELETE FROM evento WHERE cod_evento="+cod;
-			stmt.executeUpdate(sql);
-			stmt.close();
-			return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-	
 	/**
 	 * Restituisce i tavoli che hanno ordini non consegnati
-	 * @return
+	 * @return tavoli con ordini non consegnati
 	 */
 	public ArrayList<Integer> getTavoliAttivi() {
 		ArrayList<Integer> tavoli = new ArrayList<Integer>();
@@ -928,6 +1062,12 @@ public class Database {
 		return tavoli;
 	}
 	
+	/**
+	 * Modifica un prodotto impostandone la qta passata
+	 * @param cod prodotto da modificare
+	 * @param qta quantità da impostare al prodotto
+	 * @return 
+	 */
 	public boolean aggiungiQtaProdotto(int cod, int qta) {
 		try {
 			Statement stmt = c.createStatement();
@@ -941,35 +1081,12 @@ public class Database {
 		}
 	}
 	
-	public boolean nuovoBonus(String nome, int soglia, int sconto) {
-		try {
-			Statement stmt = c.createStatement();
-			String sql = "INSERT INTO bonus values('"+nome+"', "+soglia+", "+sconto+")";
-			stmt.executeUpdate(sql);
-			stmt.close();
-			return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-	
-	public int getSconto(String cf) {
-		int sconto = 0;
-		try {
-			Statement stmt = c.createStatement();
-			String sql = "SELECT sconto FROM bonus,persona WHERE cod_bonus=bonus.nome AND persona.cf='"+cf+"'";
-			ResultSet res = stmt.executeQuery(sql);
-			res.next();
-			sconto = res.getInt(1);
-			System.out.println(sconto);
-			stmt.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return sconto;
-	}
-	
+	/**
+	 * Aggiunge un evento al turno
+	 * @param cod_turno turno al quale aggiungere l'evento
+	 * @param cod_evento evento da aggiungere
+	 * @return
+	 */
 	public boolean aggiungiEventoAlTurno(int cod_turno, int cod_evento) {
 		try {
 			Statement stmt = c.createStatement();
