@@ -25,7 +25,7 @@ import gui.panel.GestorePanel;
  * Ci sono i campi per inserire gli attributi della persona da aggiungere
  * Accanto al pulsante elimina si trova una combobox delle persone salvate nel db, selezionane una per eliminarla
  *
- *Se si seleziona il checkbox dipendente si abilitano i campi ruolo e stipendio
+ * Se si seleziona il checkbox dipendente si abilitano i campi ruolo e stipendio
  *
  */
 public class DialogGestisciPersona extends JPanel implements ActionListener {
@@ -124,6 +124,12 @@ public class DialogGestisciPersona extends JPanel implements ActionListener {
 		dipendente.addActionListener(this);
 	}
 
+	/**
+	 * Se premo su "Inserisci" inserisce la persona
+	 * Se premo su "Elimina" elimina la persona
+	 * Se checko su "Dipendente" vengono abilitati i textfield del ruolo e dello stipendio
+	 * In ogni caso mostra una finestra di ok o di errore e vengono ricaricate le combobox
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
@@ -163,6 +169,9 @@ public class DialogGestisciPersona extends JPanel implements ActionListener {
 		}
 	}
 	
+	/**
+	 * Crea combobox delle persone gia salvate nel db
+	 */
 	public void creaCfElimina() {
 		cf_elimina.removeAllItems();
 		ArrayList<String> cfs = source.getLoginWindow().getDb().getPersone(true,true);
@@ -171,6 +180,9 @@ public class DialogGestisciPersona extends JPanel implements ActionListener {
 		}
 	}
 	
+	/**
+	 * Reset dei campi dopo l'inserimento
+	 */
 	public void reset() {
 		nome.setText("");
 		cognome.setText("");

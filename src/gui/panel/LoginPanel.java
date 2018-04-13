@@ -15,8 +15,7 @@ import listeners.LoginListener;
  * Il primo pannello che viene mostrato. Si tratta della finestra
  * di login, si sceglierà quale figura tenta il login(cliente-cameriere-gestore)
  * e di conseguenza verrà scritto il nuovo pannello.
- * 
- * @author simone
+ * Oppure ci si puo registrare come cliente.
  *
  */
 public class LoginPanel extends JPanel{

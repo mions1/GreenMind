@@ -15,9 +15,19 @@ import javax.swing.JPanel;
 
 import database.Database;
 import gui.MainWindow;
-import listeners.MenuListener;
+import listeners.ClienteListener;
 
-public class ClientPanel extends JPanel{
+/**
+ * Pannello che si apre quando si effettua il login come cliente
+ * Avremo davanti il menu con i prodotti da scegliere divisi per categoria
+ * e la scelta della quantità da ordinare. La quantità disponibile è quella che abbiamo nel campo qta del prodotto
+ * 
+ * Quando si effettua l'ordine si aprirà una finestra di riepilogo.
+ * Il prezzo può essere scontato secondo il bonus del cliente, cioè più ha speso da quando è cliente
+ * e più sale di categoria ed aumenta il suo sconto
+ *
+ */
+public class ClientePanel extends JPanel{
 
 	JLabel cibo;
 	JLabel bevande;
@@ -46,7 +56,7 @@ public class ClientPanel extends JPanel{
 	
 	int tavolo;
 	
-	public ClientPanel(MainWindow lw, String cf) {
+	public ClientePanel(MainWindow lw, String cf) {
 		this.lw = lw;
 		this.cf = cf;
 		
@@ -78,7 +88,7 @@ public class ClientPanel extends JPanel{
 		menu_cannabis = new ArrayList<JLabel>();
 		qta = new ArrayList<JComboBox<Integer>>();
 		
-		createMenu(lw);
+		createMenu();
 		
 		menu_panel.setLayout(new BoxLayout(menu_panel, BoxLayout.Y_AXIS));
 		cibo_qta_panel.setLayout(new GridLayout(menu_cibo.size(), 2));
@@ -116,12 +126,18 @@ public class ClientPanel extends JPanel{
 		
 		add(menu_panel);
 		
-		ordina.addActionListener(new MenuListener(this));
-		indietro.addActionListener(new MenuListener(this));
+		ordina.addActionListener(new ClienteListener(this));
+		indietro.addActionListener(new ClienteListener(this));
 		for (int i = 0; i < qta.size(); i++)
-			qta.get(i).addActionListener(new MenuListener(this));		
+			qta.get(i).addActionListener(new ClienteListener(this));		
 	}
 	
+	/**
+	 * Mostra la dialog del riepilogo dell'ordine
+	 * @param testo Testo da mostrare col riepilogo, creato nella listener
+	 * @param ordine lista dei prodotti ordinati
+	 * @param qta lista delle relative qta
+	 */
 	public void showDialog(String testo, ArrayList<ArrayList<String>> ordine, ArrayList<Integer> qta) {
 		int n = JOptionPane.showConfirmDialog(this, testo, "Confermare Ordine?", JOptionPane.YES_NO_OPTION);
 		ArrayList<Integer> qta_nuova = new ArrayList<>();
@@ -135,17 +151,20 @@ public class ClientPanel extends JPanel{
 				}
 			}
 			lw.getDb().nuovoOrdine(tavolo, cf, cod_prod, qta_nuova, lw.getDb().getCod_turnoFromDate(Database.getOggi()));
-			createMenu(lw);
+			createMenu();
 		}
 			
 	}
 	
-	private void createMenu(MainWindow lw) {
+	/**
+	 * Crea il menu mostrato nel pannello con i prodotti e le relative qta
+	 */
+	private void createMenu() {
 		Database db = lw.getDb();
 		
-		ArrayList<ArrayList<String>> cibo = db.getMenu(db.MENU_CIBO);
-		ArrayList<ArrayList<String>> bevande = db.getMenu(db.MENU_BEVANDE);
-		ArrayList<ArrayList<String>> cannabis = db.getMenu(db.MENU_CANNABIS);
+		ArrayList<ArrayList<String>> cibo = db.getMenu(Database.MENU_CIBO);
+		ArrayList<ArrayList<String>> bevande = db.getMenu(Database.MENU_BEVANDE);
+		ArrayList<ArrayList<String>> cannabis = db.getMenu(Database.MENU_CANNABIS);
 		
 		for (int i = 0; i < cibo.size(); i++) {
 			menu_cibo.add(new JLabel(cibo.get(i).get(0)));
@@ -162,6 +181,11 @@ public class ClientPanel extends JPanel{
 				
 	}
 	
+	/**
+	 * Crea la combobox qta
+	 * @param max massima qta ordinabile. La combobox andrà da 0 a max. Probabilmente max sarà la disponibilità del prodotto.
+	 * @return
+	 */
 	private JComboBox<Integer> createQta(int max) {
 		JComboBox<Integer> qta = new JComboBox<Integer>();
 		ArrayList<ArrayList<String>> prodotti = lw.getDb().getProdotti();

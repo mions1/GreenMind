@@ -46,6 +46,8 @@ public class CamerierePanel extends JPanel implements ActionListener {
 	
 	/**
 	 * Crea l'arraylist dei bottoni dei tavoli
+	 * e setta di verde quelli con ordini non consegnati
+	 * 
 	 * @return
 	 */
 	private ArrayList<JButton> createTavoli() {

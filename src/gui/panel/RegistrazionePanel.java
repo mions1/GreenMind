@@ -12,8 +12,12 @@ import gui.MainWindow;
 import listeners.RegistrazioneListener;
 
 
-
-public class RegisterPanel extends JPanel {
+/**
+ * Finestra per la registrazione di un nuovo cliente.
+ * @author simone
+ *
+ */
+public class RegistrazionePanel extends JPanel {
 
 	private JTextField cf;
 	private JTextField nome;
@@ -35,7 +39,7 @@ public class RegisterPanel extends JPanel {
 	private JPanel form;
 	private JPanel data;
 	
-	public RegisterPanel(MainWindow lw) {
+	public RegistrazionePanel(MainWindow lw) {
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
 		cf = new JTextField();

@@ -38,9 +38,12 @@ public class Main {
 		if (db.createTable())
 			System.out.println("OK!");
 		
-		//Aggiunta turno odierno se non c'è
-		if (!db.nuovoTurno(turno))
-			System.out.println("Turno già esistente");
+		//Aggiunta turno odierno se non c'è, controllo se non sono
+		//Gia passate le dieci, altrimenti mi aggiunge il turno anche se è tipo
+		//L'una di notte ed il locale deve essere ancora nel turno del giorno prima
+		if (turno.get(Calendar.HOUR_OF_DAY) > 10 )
+			if (!db.nuovoTurno(turno))
+				System.out.println("Turno già esistente");
 		
 		System.out.println("Apertura finestra login...");
 		lw.setPanel(new LoginPanel(lw));

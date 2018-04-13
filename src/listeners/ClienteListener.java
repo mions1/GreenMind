@@ -5,18 +5,28 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import database.Database;
-import gui.panel.ClientPanel;
+import gui.panel.ClientePanel;
 import gui.panel.LoginPanel;
 
-public class MenuListener implements ActionListener {
+/**
+ * Ascoltatore per la finestra del cliente.
+ *
+ */
+public class ClienteListener implements ActionListener {
 
-	ClientPanel source;
+	ClientePanel source;
 	
-	public MenuListener(ClientPanel source) {
+	public ClienteListener(ClientePanel source) {
 		// TODO Auto-generated constructor stub
 		this.source = source;
 	}
 	
+	/**
+	 * Prelevo l'ordine effettuato e creo il testo di riepilogo
+	 * considerando anche lo sconto (che prelevo sempre qui).
+	 * Una volta creato il testo chiamo showDialog() della classe ClientePanel
+	 * per mostrare questo riepilogo e chiedere se confermare o annullare l'ordine (cosa gestita dal metodo showDialog())
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
@@ -59,6 +69,12 @@ public class MenuListener implements ActionListener {
 		}
 	}
 
+	/**
+	 * Prelevo il prodotto corrispondente all'indice passato che si trova
+	 * nella lista dei prodotti del menu creata in clientepanel
+	 * @param indice
+	 * @return
+	 */
 	private ArrayList<String> getProdottoFromIndex(int indice) {
 		String nome = "";
 		//Cannbis

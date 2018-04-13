@@ -9,6 +9,10 @@ import javax.swing.JCheckBox;
 import gui.panel.CamerierePanel;
 import gui.panel.TavoloPanel;
 
+/**
+ * Ascoltatore della finestra del tavolo.
+ *
+ */
 public class TavoloListener implements ActionListener {
 
 	TavoloPanel source;
@@ -19,6 +23,10 @@ public class TavoloListener implements ActionListener {
 		
 	}
 	
+	/**
+	 * Si mostrano gli ordini attivi per quel tavolo e si possono eliminare
+	 * o settare come consegnati.
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub

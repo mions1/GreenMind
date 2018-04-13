@@ -15,8 +15,10 @@ import gui.panel.GestorePanel;
 import gui.panel.LoginPanel;
 
 /**
- * Finestra di gestione, usata dal dirigente, query di statistiche e gestione prodotti,persone e eventi
- * 
+ * Listeners della finestra di gestione.
+ * A seconda del bottone premuto si esegue l'azione.
+ * Se il bottone è una delle query di statistica si esegue la query, si prelevano i risultati e si mostra la tabella.
+ * Se il bottone è uno di gestione dei record si apre una dialog per la gestione e gli ascoltatori sono nella classe della dialog corrispondente
  *
  */
 public class GestoreListener implements ActionListener {

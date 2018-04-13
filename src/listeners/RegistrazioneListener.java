@@ -8,7 +8,7 @@ import java.util.Calendar;
 import database.Database;
 import gui.MainWindow;
 import gui.panel.LoginPanel;
-import gui.panel.RegisterPanel;
+import gui.panel.RegistrazionePanel;
 
 public class RegistrazioneListener implements ActionListener {
 
@@ -22,7 +22,7 @@ public class RegistrazioneListener implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		RegisterPanel pannello = (RegisterPanel)(source.getPannello());
+		RegistrazionePanel pannello = (RegistrazionePanel)(source.getPannello());
 		if (e.getSource().equals(pannello.getIndietro())) {
 			source.editPanel(new LoginPanel(source));
 		}

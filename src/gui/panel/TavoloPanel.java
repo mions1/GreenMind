@@ -68,7 +68,7 @@ public class TavoloPanel extends JPanel {
 	
 	/**
 	 * Crea la lista degli ordini del tavolo da mostrare nella finestra
-	 * @return
+	 * @return ritorna una lista di JLabel in cui ogni oggetto è un ordine
 	 */
 	private ArrayList<JLabel> createOrdini() {
 		ArrayList<ArrayList<String>> ordini;
@@ -150,15 +150,4 @@ public class TavoloPanel extends JPanel {
 	public ArrayList<JCheckBox> getCheck() {
 		return check;
 	}
-	
-	public ArrayList<Integer> getCodOrdini(ArrayList<Integer> num_ordini) {
-		ArrayList<ArrayList<String>> ordini = lw.getDb().getOrdine(tavolo, false);
-		ArrayList<Integer> cod_ordini = new ArrayList<>();
-		
-		for (int i = 0; i < ordini.size(); i++)
-			if (num_ordini.contains(i))
-				cod_ordini.add(Integer.parseInt(ordini.get(i).get(0)));
-		
-		return cod_ordini;
- 	}
 }

@@ -20,6 +20,7 @@ import gui.panel.GestorePanel;
  * Dialog per aggiungere ed eliminare eventi
  * Ci sono i campi per inserire gli attributi dell'evento da aggiungere
  * Accanto al pulsante elimina si trova una combobox degli eventi salvati nel db, selezionane uno per eliminarlo
+ * Accanto al pulsante inserisci nel turno si trovano le combobox dei turni e degli eventi
  *
  */
 public class DialogGestisciEvento extends JPanel implements ActionListener {
@@ -85,6 +86,12 @@ public class DialogGestisciEvento extends JPanel implements ActionListener {
 		inserisci_in_turno.addActionListener(this);
 	}
 
+	/**
+	 * Se premo su "Inserisci" inserisce il turno
+	 * Se premo su "Elimina" elimina il turno 
+	 * Se premo su "Inserisci nel turno" inserisce l'evento nel turno selezionato 
+	 * In ogni caso mostra una finestra di ok o di errore e vengono ricaricate le combobox
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
@@ -149,6 +156,9 @@ public class DialogGestisciEvento extends JPanel implements ActionListener {
 		}
 	}
 	
+	/**
+	 * Crea la combobox dei turni gia salvati nel db
+	 */
 	public void creaTurni() {
 		this.turni.removeAll();
 		ArrayList<ArrayList<String>> turni = source.getLoginWindow().getDb().getTurni(Database.getOggi());
@@ -156,6 +166,9 @@ public class DialogGestisciEvento extends JPanel implements ActionListener {
 			this.turni.addItem(turno.get(1) + " ("+turno.get(0)+")");
 	}
 	
+	/**
+	 * Resetta i campi dopo l'inserimento
+	 */
 	public void reset() {
 		nome.setText("");
 		tipo.setText("");

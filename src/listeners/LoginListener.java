@@ -8,11 +8,15 @@ import java.awt.event.MouseListener;
 
 import gui.MainWindow;
 import gui.panel.CamerierePanel;
-import gui.panel.ClientPanel;
+import gui.panel.ClientePanel;
 import gui.panel.GestorePanel;
 import gui.panel.LoginPanel;
-import gui.panel.RegisterPanel;
+import gui.panel.RegistrazionePanel;
 
+/**
+ * Ascoltatori del pannello di login.
+ *
+ */
 public class LoginListener implements ActionListener, KeyListener, MouseListener {
 
 	MainWindow source;
@@ -22,6 +26,11 @@ public class LoginListener implements ActionListener, KeyListener, MouseListener
 		this.source = source;
 	}
 	
+	/**
+	 * Se premo su Registrazione mi apre il pannello per la registrazione.
+	 * Se premo su login (o tasto invio) mi controlla se il codice fiscale è valido
+	 * per il tipo di login che sto tentando (cliente-dirigente-cameriere) e nel caso mi apre la finestra corrispondente
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
@@ -29,7 +38,7 @@ public class LoginListener implements ActionListener, KeyListener, MouseListener
 		
 		//Click su "registrazione", viene aperto il form
 		if (pannello.getNuovoCliente().equals(e.getSource())) {
-			source.editPanel(new RegisterPanel(source));
+			source.editPanel(new RegistrazionePanel(source));
 		}
 		
 		//Viene effettuato il login. Vedi login per info
@@ -77,7 +86,7 @@ public class LoginListener implements ActionListener, KeyListener, MouseListener
 				if (cf.equals("io")) //Per far prima
 					cf = "MNISMN95R05A341B";
 				if (source.getDb().loginCliente(cf)) {
-					source.editPanel(new ClientPanel(source,cf));
+					source.editPanel(new ClientePanel(source,cf));
 				}
 				else
 					System.out.println("NOPE");

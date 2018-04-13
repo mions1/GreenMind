@@ -27,7 +27,8 @@ import gui.panel.GestorePanel;
  * Dialog per aggiungere ed eliminare prodotti
  * Ci sono i campi per inserire gli attributi del prodotto da aggiungere
  * Accanto al pulsante elimina si trova una combobox dei prodotti salvati nel db, selezionane uno per eliminarlo
- *
+ * Si puo settare la quantità dei prodotti gia inseriti
+ * 
  */
 public class DialogGestisciProdotto extends JPanel implements ActionListener {
 
@@ -126,6 +127,12 @@ public class DialogGestisciProdotto extends JPanel implements ActionListener {
 		aggiungi_qta.addActionListener(this);
 	}
 
+	/**
+	 * Se premo su "Inserisci" inserisce il prodotto
+	 * Se premo su "Elimina" elimina il prodotto 
+	 * Se premo su "Aggiungi" setto la quantita del prodotto selezionato
+	 * In ogni caso mostra una finestra di ok o di errore e vengono ricaricate le combobox
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
@@ -170,6 +177,9 @@ public class DialogGestisciProdotto extends JPanel implements ActionListener {
 		}
 	}
 	
+	/**
+	 * Riempie la combobox con i prodotti gia inseriti da eliminare
+	 */
 	public void creaProdottiElimina() {
 		prodotti_elimina.removeAllItems();
 		ArrayList<ArrayList<String>> prodotti = source.getLoginWindow().getDb().getProdotti();
@@ -178,6 +188,9 @@ public class DialogGestisciProdotto extends JPanel implements ActionListener {
 		}
 	}
 	
+	/**
+	 * Crea la combobox con i prodotti gia inseriti per settare la quantita
+	 */
 	public void creaProdottiAggiungi() {
 		prodotti_aggiungi.removeAllItems();
 		ArrayList<ArrayList<String>> prodotti = source.getLoginWindow().getDb().getProdotti();
@@ -186,6 +199,9 @@ public class DialogGestisciProdotto extends JPanel implements ActionListener {
 		}
 	}
 	
+	/**
+	 * Resetta i campi dopo l'inserimento
+	 */
 	public void reset() {
 		nome.setText("");
 		scheda.setText("");

@@ -22,25 +22,12 @@ import listeners.GestoreListener;
  * Finestra di gestione, attività:
  * 	-Campo di testo per query al volo
  * 	-Aggiunta/Elimina/Modifica di ogni record nelle tabelle
- * 	-Diverse query per finalità statistiche come:
- * 		v Nazionalità dei clienti
- * 		v Età media dei clienti
- * 		v Spesa totale per cliente
- * 		v Prodotti ordinati in base ai piu chiesti
- * 		v Prodotti ordinati in base ai guadagni piu alti
- * 		v Cliente piu ordinante
- * 		- I 3 eventi presenti nel turno con maggior guadagni
- * 		-...
- * 		-inserisci evento
- * 		-elimina evento
- * 		-
- * 	
- * 
- * @author simone
+ * 	-Diverse query per finalità statistiche.
  *
  */
 public class GestorePanel extends JPanel {
 
+	//Per capire quale bottone si è premuto
 	public final String NAZ_PIU_FREQ = "1";
 	public final String ETA_MEDIA = "2";
 	public final String TOT_PER_CF = "3";
@@ -176,6 +163,11 @@ public class GestorePanel extends JPanel {
 		return lw;
 	}
 	
+	/**
+	 * Crea la tabella dei risultati della query
+	 * @param nomi_colonne nomi colonne da mostrare
+	 * @param risultati risultati da mostrare
+	 */
 	public void setTable(ArrayList<String> nomi_colonne, ArrayList<ArrayList<Object>> risultati) {
 		table = new TabellaRisultati(new ModelloTabella(nomi_colonne, risultati));
 		scroll_pane.getViewport().removeAll();

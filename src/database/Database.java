@@ -982,6 +982,7 @@ public class Database {
 		turno.set(Calendar.YEAR, turno.get(Calendar.YEAR));
 		turno.set(Calendar.MONTH, turno.get(Calendar.MONTH));
 		turno.set(Calendar.DATE, turno.get(Calendar.DAY_OF_MONTH));
+		turno.set(Calendar.HOUR_OF_DAY, turno.get(Calendar.HOUR_OF_DAY));
 		return turno;
 	}
 	
