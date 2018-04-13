@@ -6,15 +6,15 @@ import java.sql.Date;
 import java.util.Calendar;
 
 import database.Database;
-import gui.Login_window;
+import gui.MainWindow;
 import gui.panel.LoginPanel;
 import gui.panel.RegisterPanel;
 
 public class RegistrazioneListener implements ActionListener {
 
-	Login_window source;
+	MainWindow source;
 	
-	public RegistrazioneListener(Login_window lw) {
+	public RegistrazioneListener(MainWindow lw) {
 		// TODO Auto-generated constructor stub
 		this.source = lw;
 	}

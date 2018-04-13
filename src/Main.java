@@ -1,7 +1,7 @@
 import java.util.Calendar;
 
 import database.Database;
-import gui.Login_window;
+import gui.MainWindow;
 import gui.panel.LoginPanel;
 import sun.font.CreatedFontTracker;
 
@@ -30,7 +30,7 @@ public class Main {
 
 		Database db = new Database();
 		Calendar turno = Database.getOggi();
-		Login_window lw = new Login_window(db);
+		MainWindow lw = new MainWindow(db);
 		
 		
 		//resetDb(db);

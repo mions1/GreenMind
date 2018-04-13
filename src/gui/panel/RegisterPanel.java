@@ -8,7 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import gui.Login_window;
+import gui.MainWindow;
 import listeners.RegistrazioneListener;
 
 
@@ -35,7 +35,7 @@ public class RegisterPanel extends JPanel {
 	private JPanel form;
 	private JPanel data;
 	
-	public RegisterPanel(Login_window lw) {
+	public RegisterPanel(MainWindow lw) {
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
 		cf = new JTextField();

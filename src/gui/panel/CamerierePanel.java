@@ -9,7 +9,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import gui.Login_window;
+import gui.MainWindow;
 
 /**
  * Finestra del cameriere, dove ci sono i bottoni dei tavoli.
@@ -21,9 +21,9 @@ public class CamerierePanel extends JPanel implements ActionListener {
 	ArrayList<JButton> tavoli;	//Bottoni dei tavoli (10 di def)
 	JPanel tavoli_panel;		//Pannello dei bottoni dei tavoli
 	JButton indietro;
-	Login_window lw;
+	MainWindow lw;
 	
-	public CamerierePanel(Login_window lw) {
+	public CamerierePanel(MainWindow lw) {
 		this.lw = lw;
 		
 		tavoli = createTavoli();

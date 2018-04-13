@@ -7,7 +7,7 @@ import javax.swing.JTextField;
 
 import org.jdesktop.swingx.prompt.*;
 
-import gui.Login_window;
+import gui.MainWindow;
 import listeners.LoginListener;
 
 
@@ -36,7 +36,7 @@ public class LoginPanel extends JPanel{
 	JPanel credenziali_panel;		//Credenziali (textfields)
 	JPanel selezione_panel;			//Selezione tipo utente e registrazione
 	
-	public LoginPanel (Login_window lw) {
+	public LoginPanel (MainWindow lw) {
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
 		//Definizione componenti

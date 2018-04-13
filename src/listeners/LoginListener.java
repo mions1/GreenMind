@@ -6,7 +6,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import gui.Login_window;
+import gui.MainWindow;
 import gui.panel.CamerierePanel;
 import gui.panel.ClientPanel;
 import gui.panel.GestorePanel;
@@ -15,9 +15,9 @@ import gui.panel.RegisterPanel;
 
 public class LoginListener implements ActionListener, KeyListener, MouseListener {
 
-	Login_window source;
+	MainWindow source;
 
-	public LoginListener(Login_window source) {
+	public LoginListener(MainWindow source) {
 		// TODO Auto-generated constructor stub
 		this.source = source;
 	}

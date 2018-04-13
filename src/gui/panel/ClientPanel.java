@@ -14,7 +14,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import database.Database;
-import gui.Login_window;
+import gui.MainWindow;
 import listeners.MenuListener;
 
 public class ClientPanel extends JPanel{
@@ -42,11 +42,11 @@ public class ClientPanel extends JPanel{
 	
 	float totale;
 	
-	Login_window lw;
+	MainWindow lw;
 	
 	int tavolo;
 	
-	public ClientPanel(Login_window lw, String cf) {
+	public ClientPanel(MainWindow lw, String cf) {
 		this.lw = lw;
 		this.cf = cf;
 		
@@ -140,7 +140,7 @@ public class ClientPanel extends JPanel{
 			
 	}
 	
-	private void createMenu(Login_window lw) {
+	private void createMenu(MainWindow lw) {
 		Database db = lw.getDb();
 		
 		ArrayList<ArrayList<String>> cibo = db.getMenu(db.MENU_CIBO);
@@ -220,7 +220,7 @@ public class ClientPanel extends JPanel{
 	}
 	
 	
-	public Login_window getLoginWindow() {
+	public MainWindow getLoginWindow() {
 		return lw;
 	}
 	

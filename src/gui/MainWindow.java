@@ -12,7 +12,16 @@ import javax.swing.JTextField;
 
 import database.Database;
 
-public class Login_window extends JFrame{
+/**
+ * Frame principale, dentro questa finistra andremo a disegnare
+ * le diverse schermate. 
+ * Ogni schermata avrà sempre in alto il logo del locale.
+ * Si utilizzerà sempre un riferimento a questa classe per poter
+ * recuperare il database e per poter cambiare il pannello con il metodo
+ * editPanel()
+ *
+ */
+public class MainWindow extends JFrame{
 
 	//Dichiarazione componenti
 	JLabel logo;					//Logo del locale
@@ -24,7 +33,7 @@ public class Login_window extends JFrame{
 	
 	Database db;
 	
-	public Login_window (Database db) {
+	public MainWindow (Database db) {
 		
 		this.db = db;
 		window = new JPanel();

@@ -13,7 +13,7 @@ import javax.swing.JTextField;
 
 import org.jdesktop.swingx.prompt.PromptSupport;
 
-import gui.Login_window;
+import gui.MainWindow;
 import gui.ModelloTabella;
 import gui.TabellaRisultati;
 import listeners.GestoreListener;
@@ -67,9 +67,9 @@ public class GestorePanel extends JPanel {
 	
 	JDialog dialog;
 	
-	Login_window lw;
+	MainWindow lw;
 	
-	public GestorePanel (Login_window lw) {
+	public GestorePanel (MainWindow lw) {
 		query = new ArrayList<JButton>();
 		custom_query = new JTextField();
 		PromptSupport.setPrompt("Query Personalizzata", custom_query);
@@ -80,7 +80,7 @@ public class GestorePanel extends JPanel {
 		gestisciProdotto = new JButton("Gestisci Prodotto");
 		gestisciEvento = new JButton("Gestisci Evento");
 		
-		dialog = new JDialog(new Login_window(lw.getDb()));
+		dialog = new JDialog(new MainWindow(lw.getDb()));
 		
 		this.lw = lw;
 		
@@ -172,7 +172,7 @@ public class GestorePanel extends JPanel {
 		return custom_query;
 	}
 	
-	public Login_window getLoginWindow() {
+	public MainWindow getLoginWindow() {
 		return lw;
 	}
 	

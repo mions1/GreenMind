@@ -8,7 +8,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import gui.Login_window;
+import gui.MainWindow;
 import listeners.TavoloListener;
 
 /**
@@ -19,7 +19,7 @@ import listeners.TavoloListener;
 public class TavoloPanel extends JPanel {
 
 	int tavolo;
-	Login_window lw;
+	MainWindow lw;
 	
 	ArrayList<JLabel> ordini;
 	JPanel ordini_panel;
@@ -30,7 +30,7 @@ public class TavoloPanel extends JPanel {
 	
 	ArrayList<JCheckBox> check;
 	
-	public TavoloPanel(int tavolo, Login_window lw) {
+	public TavoloPanel(int tavolo, MainWindow lw) {
 		this.tavolo = tavolo;
 		this.lw = lw;
 
@@ -143,7 +143,7 @@ public class TavoloPanel extends JPanel {
 		this.consegnato = consegnato;
 	}
 	
-	public Login_window getLoginWindow() {
+	public MainWindow getLoginWindow() {
 		return lw;
 	}
 	

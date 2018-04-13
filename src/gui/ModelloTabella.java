@@ -4,6 +4,16 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
+/**
+ * Estende AbstractTableModel, il modello della tabella per
+ * mostrare i risultati delle query eseguite dal gestore.
+ * 
+ * Gli header saranno i nomi dei campi dei risultati della query
+ * ed i campi saranno i risultati.
+ * 
+ * @author simone
+ *
+ */
 public class ModelloTabella extends AbstractTableModel {
 
 	int righe;
@@ -18,6 +28,11 @@ public class ModelloTabella extends AbstractTableModel {
 		valori = new ArrayList<ArrayList<Object>>();
 	}
 	
+	/**
+	 * Costruttore modello tabella
+	 * @param nomi_colonne nomi delle colonne dei risultati da mostrare. Con questa list si trova quindi anche il numero di colonne
+	 * @param valori I valori da mostrare. Da questo si definisce il numero di righe.
+	 */
 	public ModelloTabella(ArrayList<String> nomi_colonne, ArrayList<ArrayList<Object>> valori) {
 		// TODO Auto-generated constructor stub
 		this.righe = valori.size();
