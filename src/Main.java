@@ -28,7 +28,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 
-		Database db = new Database();
+		Database db = new Database("GreenMind","postgres","mions95");
 		Calendar turno = Database.getOggi();
 		MainWindow lw = new MainWindow(db);
 		

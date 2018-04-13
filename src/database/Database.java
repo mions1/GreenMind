@@ -56,13 +56,13 @@ public class Database {
 	/**
 	 * Stabilisce la connessione con il database GreenMind in localhost
 	 */
-	public Database () {
+	public Database (String nome_db, String nome_account, String psw) {
 		c = null;
 		
 		try {
         Class.forName("org.postgresql.Driver");
-        c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/GreenMind", 
-        		"postgres", "mions95");
+        c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/"+nome_db, 
+        		nome_account, psw);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
