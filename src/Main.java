@@ -5,8 +5,6 @@ import gui.MainWindow;
 import gui.panel.LoginPanel;
 import sun.font.CreatedFontTracker;
 
-//Check, lista valori ammessi, etc
-
 /**
  * Gestione del coffee shop GreenMind, interfaccia con il database.
  * 
@@ -33,7 +31,7 @@ public class Main {
 		MainWindow lw = new MainWindow(db);
 		
 		
-		//resetDb(db);
+		resetDb(db);
 		System.out.println("Creazione tabelle...");
 		if (db.createTable())
 			System.out.println("OK!");

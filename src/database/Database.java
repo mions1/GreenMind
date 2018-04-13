@@ -100,8 +100,8 @@ public class Database {
 			//Creazione tabella bonus
 			sql = "CREATE TABLE IF NOT EXISTS bonus ("
 					+ "nome varchar primary key,"
-					+ "soglia integer not null,"
-					+ "sconto integer not null)";
+					+ "soglia integer check (soglia >= 0) not null unique,"
+					+ "sconto integer check (sconto >= 0) not null)";
 			stmt.executeUpdate(sql);
 			
 			//Creazione tabella Persona
@@ -111,8 +111,8 @@ public class Database {
 					+ "cognome varchar not null,"
 					+ "data_nascita date not null,"
 					+ "nazionalita varchar not null,"
-					+ "stipendio real,"
-					+ "ruolo varchar,"
+					+ "stipendio real check (stipendio >= 0),"
+					+ "ruolo varchar check (ruolo in ('cameriere','dirigente', 'barista',null)),"
 					+ "s1 boolean,"
 					+ "s2 boolean,"
 					+ "cod_bonus varchar not null,"
@@ -129,7 +129,7 @@ public class Database {
 			//Creazione tabella Turno
 			sql = "CREATE TABLE IF NOT EXISTS turno ("
 					+ "cod_turno SERIAL primary key,"
-					+ "data date not null,"
+					+ "data date not null unique,"
 					+ "cod_evento integer,"
 					+ "foreign key(cod_evento) references evento)";
 			stmt.executeUpdate(sql);
@@ -158,11 +158,11 @@ public class Database {
 					+ "s1 boolean,"
 					+ "s2 boolean,"
 					+ "s3 boolean,"
-					+ "qta integer,"
-					+ "nome varchar not null,"
+					+ "qta integer check (qta >= 0),"
+					+ "nome varchar not null unique,"
 					+ "scheda varchar not null,"
-					+ "tipo varchar,"
-					+ "prezzo real not null)";
+					+ "tipo varchar check (tipo in (null,'vegetariano','vegano')),"
+					+ "prezzo real not null check (prezzo > 0))";
 			stmt.executeUpdate(sql);
 			//Creazione tabella Presenta
 			sql = "CREATE TABLE IF NOT EXISTS presenta ("
