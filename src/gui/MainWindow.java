@@ -39,7 +39,7 @@ public class MainWindow extends JFrame{
 		window = new JPanel();
 		logo_panel = new JPanel();
 		
-		logo_string = "Big Boy - Coffee & Food Shop";
+		logo_string = "Green Mind - Coffee & Food Shop";
 
 		logo = new JLabel(logo_string);
 			logo.setFont(new Font(null, Font.PLAIN, 20));

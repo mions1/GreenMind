@@ -2,6 +2,8 @@ package listeners;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -11,6 +13,7 @@ import javax.swing.JOptionPane;
 import gui.dialog.DialogGestisciEvento;
 import gui.dialog.DialogGestisciPersona;
 import gui.dialog.DialogGestisciProdotto;
+import gui.dialog.DialogGestisciTurno;
 import gui.panel.GestorePanel;
 import gui.panel.LoginPanel;
 
@@ -21,7 +24,7 @@ import gui.panel.LoginPanel;
  * Se il bottone è uno di gestione dei record si apre una dialog per la gestione e gli ascoltatori sono nella classe della dialog corrispondente
  *
  */
-public class GestoreListener implements ActionListener {
+public class GestoreListener implements ActionListener, KeyListener {
 
 	GestorePanel source;
 	
@@ -37,7 +40,7 @@ public class GestoreListener implements ActionListener {
 		
 		if (e.getSource().equals(source.getGestisciPersona())) {
 			JOptionPane.showOptionDialog(
-					null, new DialogGestisciPersona(source),"Gestisci Prodotto", 
+					null, new DialogGestisciPersona(source),"Gestisci Persona", 
 					JOptionPane.DEFAULT_OPTION,
 					JOptionPane.INFORMATION_MESSAGE, 
 					null, new Object[]{}, null);
@@ -53,7 +56,15 @@ public class GestoreListener implements ActionListener {
 		
 		else if (e.getSource().equals(source.getGestisciEvento())) {
 			JOptionPane.showOptionDialog(
-					null, new DialogGestisciEvento(source),"Gestisci Prodotto", 
+					null, new DialogGestisciEvento(source),"Gestisci Evento", 
+					JOptionPane.DEFAULT_OPTION,
+					JOptionPane.INFORMATION_MESSAGE, 
+					null, new Object[]{}, null);
+		}
+		
+		else if (e.getSource().equals(source.getGestisciTurno())) {
+			JOptionPane.showOptionDialog(
+					null, new DialogGestisciTurno(source),"Gestisci Turno", 
 					JOptionPane.DEFAULT_OPTION,
 					JOptionPane.INFORMATION_MESSAGE, 
 					null, new Object[]{}, null);
@@ -74,37 +85,60 @@ public class GestoreListener implements ActionListener {
 					+ "FROM persona WHERE s2=true";
 		
 		else if (e.getActionCommand().equals(source.TOT_PER_CF))
-			sql = "SELECT persona.cf, sum((presenta.qta*prodotto.prezzo)) as tot "
-					+ "from persona,prodotto, presenta, ordina "
-					+ "where presenta.cod_prodotto=prodotto.cod_prodotto "
-					+ "AND presenta.cod_ordine=ordina.cod_ordine "
-					+ "AND ordina.cf=persona.cf "
+			sql = "SELECT persona.cf, sum(totale) as tot "
+					+ "from persona, ordine "
+					+ "WHERE ordine.cf=persona.cf "
 					+ "GROUP BY persona.cf order by tot desc";
 		
 		else if (e.getActionCommand().equals(source.PROD_PIU_CHIESTI))
 			sql = "SELECT prodotto.nome, presenta.qta "
-					+ "FROM prodotto, ordina, presenta "
+					+ "FROM prodotto, ordine, presenta "
 					+ "WHERE presenta.cod_prodotto=prodotto.cod_prodotto "
-					+ "AND presenta.cod_ordine=ordina.cod_ordine "
+					+ "AND presenta.cod_ordine=ordine.cod_ordine "
 					+ "ORDER BY presenta.qta desc";
 		
 		else if (e.getActionCommand().equals(source.PROD_PIU_LUCRO))
 			sql = "SELECT prodotto.nome, (presenta.qta*prezzo) as tot "
-					+ "FROM prodotto, ordina, presenta "
+					+ "FROM prodotto, ordine, presenta "
 					+ "WHERE presenta.cod_prodotto=prodotto.cod_prodotto "
-					+ "AND presenta.cod_ordine=ordina.cod_ordine "
+					+ "AND presenta.cod_ordine=ordine.cod_ordine "
 					+ "ORDER BY tot desc";
 		
 		else if (e.getActionCommand().equals(source.CLIENTE_PIU_ORDINI))
 			sql = "SELECT persona.cf, count(*) as num_ordini "
-					+ "FROM persona, ordina "
-					+ "WHERE ordina.cf = persona.cf "
+					+ "FROM persona, ordine "
+					+ "WHERE ordine.cf = persona.cf "
 					+ "GROUP BY persona.cf "
 					+ "ORDER BY num_ordini DESC LIMIT 1";
 		
 		else if (e.getSource().equals(source.getEsegui()))
 			sql = source.getCustomQuery().getText();
 		
+		eseguiQuery(sql);
+		}
+
+	@Override
+	public void keyPressed(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+		if (e.getKeyCode() == e.VK_ENTER) {
+			if (source.getCustomQuery().getText().length() > 0)
+				eseguiQuery(source.getCustomQuery().getText());
+		}
+	}
+
+	@Override
+	public void keyTyped(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private void eseguiQuery(String sql) {
 		if (sql != "") {
 			ArrayList<ArrayList<Object>> risultati = new ArrayList<ArrayList<Object>>();
 			ArrayList<String> nomi_colonne = new ArrayList<String>();
@@ -129,9 +163,6 @@ public class GestoreListener implements ActionListener {
 			
 			source.setTable(nomi_colonne, risultati);
 		}
-		
-		
-		
 	}
 	
 }

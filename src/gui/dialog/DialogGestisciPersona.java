@@ -174,9 +174,9 @@ public class DialogGestisciPersona extends JPanel implements ActionListener {
 	 */
 	public void creaCfElimina() {
 		cf_elimina.removeAllItems();
-		ArrayList<String> cfs = source.getLoginWindow().getDb().getPersone(true,true);
-		for (String cf: cfs) {
-			cf_elimina.addItem(cf);
+		ArrayList<ArrayList<String>> persone = source.getLoginWindow().getDb().getPersone(true,true);
+		for (ArrayList<String> persona: persone) {
+			cf_elimina.addItem(persona.get(Database.PERSONA_CF-1));
 		}
 	}
 	

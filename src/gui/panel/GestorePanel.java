@@ -49,6 +49,7 @@ public class GestorePanel extends JPanel {
 	JButton gestisciPersona;
 	JButton gestisciProdotto;
 	JButton gestisciEvento;
+	JButton gestisciTurno;
 	
 	JPanel gestione;
 	
@@ -66,6 +67,7 @@ public class GestorePanel extends JPanel {
 		gestisciPersona = new JButton("Gestisci Persona");
 		gestisciProdotto = new JButton("Gestisci Prodotto");
 		gestisciEvento = new JButton("Gestisci Evento");
+		gestisciTurno = new JButton("Gestisci Turno");
 		
 		dialog = new JDialog(new MainWindow(lw.getDb()));
 		
@@ -114,6 +116,7 @@ public class GestorePanel extends JPanel {
 		gestione.add(gestisciPersona);
 		gestione.add(gestisciProdotto);
 		gestione.add(gestisciEvento);
+		gestione.add(gestisciTurno);
 		
 		this.add(gestione);
 		this.add(indietro);
@@ -126,8 +129,10 @@ public class GestorePanel extends JPanel {
 		gestisciPersona.addActionListener(new GestoreListener(this));
 		gestisciProdotto.addActionListener(new GestoreListener(this));
 		gestisciEvento.addActionListener(new GestoreListener(this));
+		gestisciTurno.addActionListener(new GestoreListener(this));
 		
 		esegui.addActionListener(new GestoreListener(this));
+		custom_query.addKeyListener(new GestoreListener(this));
 		indietro.addActionListener(new GestoreListener(this));
 		table = new TabellaRisultati(new ModelloTabella());
 		scroll_pane.setViewportView(table);
@@ -149,6 +154,10 @@ public class GestorePanel extends JPanel {
 	
 	public JButton getGestisciEvento() {
 		return gestisciEvento;
+	}
+	
+	public JButton getGestisciTurno() {
+		return gestisciTurno;
 	}
 	
 	public JButton getIndietro() {

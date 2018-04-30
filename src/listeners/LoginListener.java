@@ -6,12 +6,15 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import javax.swing.JOptionPane;
+
 import gui.MainWindow;
 import gui.panel.CamerierePanel;
 import gui.panel.ClientePanel;
 import gui.panel.GestorePanel;
 import gui.panel.LoginPanel;
 import gui.panel.RegistrazionePanel;
+import jdk.nashorn.internal.scripts.JO;
 
 /**
  * Ascoltatori del pannello di login.
@@ -98,7 +101,8 @@ public class LoginListener implements ActionListener, KeyListener, MouseListener
 					source.editPanel(new CamerierePanel(source));
 				}
 				else
-					System.out.println("NOPE");
+					JOptionPane.showMessageDialog(source, "Cameriere non in turno", "Nope", JOptionPane.ERROR_MESSAGE);
+
 				return;
 				
 			case "Gestore":

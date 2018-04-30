@@ -138,7 +138,7 @@ public class ClientePanel extends JPanel{
 	 * @param ordine lista dei prodotti ordinati
 	 * @param qta lista delle relative qta
 	 */
-	public void showDialog(String testo, ArrayList<ArrayList<String>> ordine, ArrayList<Integer> qta) {
+	public void showDialog(String testo, ArrayList<ArrayList<String>> ordine, ArrayList<Integer> qta, float totale) {
 		int n = JOptionPane.showConfirmDialog(this, testo, "Confermare Ordine?", JOptionPane.YES_NO_OPTION);
 		ArrayList<Integer> qta_nuova = new ArrayList<>();
 		if (n == JOptionPane.YES_OPTION) {
@@ -150,8 +150,15 @@ public class ClientePanel extends JPanel{
 					qta_nuova.add(qta.get(i));
 				}
 			}
-			lw.getDb().nuovoOrdine(tavolo, cf, cod_prod, qta_nuova, lw.getDb().getCod_turnoFromDate(Database.getOggi()));
-			createMenu();
+			int nuovo_ordine = lw.getDb().nuovoOrdine(tavolo, cf, cod_prod, qta_nuova, lw.getDb().getCod_turnoFromDate(Database.getOggi()),totale);
+			if (nuovo_ordine == 0)
+				JOptionPane.showMessageDialog(this, "Ordine eseguito", "Ok", JOptionPane.INFORMATION_MESSAGE,null);
+			else if (nuovo_ordine == -1)
+				JOptionPane.showMessageDialog(this, "Errore di sistema", "Nope", JOptionPane.OK_OPTION,null);
+			else if (nuovo_ordine == 1)
+				JOptionPane.showMessageDialog(this, "Acquisto di cannabis da parte di minorenni non consentito", "Nope", JOptionPane.OK_OPTION,null);
+			
+			reset();
 		}
 			
 	}
@@ -179,6 +186,10 @@ public class ClientePanel extends JPanel{
 			qta.add(createQta(Integer.parseInt(cannabis.get(i).get(1))));
 		}
 				
+	}
+	
+	public void reset() {
+		lw.editPanel(new ClientePanel(lw, cf));
 	}
 	
 	/**

@@ -61,7 +61,7 @@ public class ClienteListener implements ActionListener {
 				}
 			totale = ((totale*(100-sconto))/100);
 			testo += "\nTotale: "+totale+" €";
-			source.showDialog(testo,ordine,qta);
+			source.showDialog(testo,ordine,qta,totale);
 		}
 		
 		else if (e.getSource().equals(source.getIndietro())) {

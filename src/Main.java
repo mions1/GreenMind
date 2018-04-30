@@ -42,10 +42,10 @@ public class Main {
 		if (turno.get(Calendar.HOUR_OF_DAY) > 10 )
 			if (!db.nuovoTurno(turno))
 				System.out.println("Turno già esistente");
-		
+		db.aggiungiDipendenteAlTurno("ABCDFG89T23G312T", 1);
 		System.out.println("Apertura finestra login...");
 		lw.setPanel(new LoginPanel(lw));
-		lw.setSize(500,500);
+		lw.setSize(700,500);
 		lw.setVisible(true);
 		System.out.println("OK!");
 		
