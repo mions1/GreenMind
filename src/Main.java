@@ -26,23 +26,20 @@ public class Main {
 	
 	public static void main(String[] args) {
 
-		Database db = new Database("GreenMind","postgres","mions95");
+		Database db = new Database("GreenMind","postgres","postgres");
 		Calendar turno = Database.getOggi();
 		MainWindow lw = new MainWindow(db);
 		
 		
 		resetDb(db);
-		System.out.println("Creazione tabelle...");
-		if (db.createTable())
-			System.out.println("OK!");
+//		System.out.println("Creazione tabelle...");
+//		if (db.createTable())
+//			System.out.println("OK!");
 		
-		//Aggiunta turno odierno se non c'è, controllo se non sono
-		//Gia passate le dieci, altrimenti mi aggiunge il turno anche se è tipo
-		//L'una di notte ed il locale deve essere ancora nel turno del giorno prima
-		if (turno.get(Calendar.HOUR_OF_DAY) > 10 )
-			if (!db.nuovoTurno(turno))
-				System.out.println("Turno già esistente");
+		db.nuovoTurno(Database.getOggi());
 		db.aggiungiDipendenteAlTurno("ABCDFG89T23G312T", 1);
+		db.aggiungiEventoAlTurno(1, 1);
+		
 		System.out.println("Apertura finestra login...");
 		lw.setPanel(new LoginPanel(lw));
 		lw.setSize(700,500);

@@ -158,8 +158,8 @@ public class Database {
 					+ "cf varchar not null,"
 					+ "cod_turno integer not null, "
 					+ "primary key(cod_turno,cf), "
-					+ "foreign key(cf) references persona,"
-					+ "foreign key(cod_turno) references turno)";
+					+ "foreign key(cf) references persona ON DELETE CASCADE,"
+					+ "foreign key(cod_turno) references turno ON DELETE CASCADE)";
 			stmt.executeUpdate(sql);
 			//Creazione tabella ordine
 			sql = "CREATE TABLE IF NOT EXISTS ordine ("
@@ -167,11 +167,11 @@ public class Database {
 					+ "sconto integer not null,"
 					+ "tavolo integer not null,"
 					+ "cf varchar(16) not null,"
-					+ "cod_turno integer not null,"
+					+ "cod_turno integer,"
 					+ "consegnato boolean not null,"
 					+ "totale real not null,"
 					+ "foreign key(cf) references persona,"
-					+ "foreign key(cod_turno) references turno)";
+					+ "foreign key(cod_turno) references turno ON DELETE SET NULL)";
 			stmt.executeUpdate(sql);
 			//Creazione tabella Prodotto
 			sql = "CREATE TABLE IF NOT EXISTS prodotto ("
@@ -195,6 +195,13 @@ public class Database {
 					+ "foreign key(cod_ordine) references ordine ON DELETE CASCADE)";
 			stmt.executeUpdate(sql);
 			
+			//CREAZIONI INDICI
+			sql = "CREATE INDEX ON persona (cf)";
+			stmt.executeUpdate(sql);
+			sql = "CREATE INDEX ON prodotto (cod_prodotto)";
+			stmt.executeUpdate(sql);
+			sql = "CREATE INDEX ON ordine (cod_ordine)";
+			stmt.executeUpdate(sql);
 		}
 		
 		catch (SQLException e) {
@@ -378,7 +385,7 @@ public class Database {
 			//Inserimento 2 eventi
 			nuovoEvento("Karaoke con Vanessa", "karaoke");
 			nuovoEvento("Gioco a premi", "quiz");
-			
+						
 		return true;
 	}
 
@@ -520,21 +527,21 @@ public class Database {
 		
 		try {
 			PreparedStatement prep;
-			ArrayList<ArrayList<String>> turni = getTurni();
-			String data = "";
-			data = Integer.toString(turno.get(Calendar.YEAR));
-			if (turno.get(Calendar.MONTH)+1 < 10)
-				data += "-0"+Integer.toString(turno.get(Calendar.MONTH)+1);
-			else
-				data += "-0"+Integer.toString(turno.get(Calendar.MONTH)+1);
-			data += "-"+Integer.toString(turno.get(Calendar.DAY_OF_MONTH));
-			
-			//Se la data già c'è non aggiunge il turno
-			for (int i=0; i<turni.size(); i++) {
-				if (turni.get(i).get(1).toString().equals(data)) {
-					return false;
-				}
-			}
+//			ArrayList<ArrayList<String>> turni = getTurni();
+//			String data = "";
+//			data = Integer.toString(turno.get(Calendar.YEAR));
+//			if (turno.get(Calendar.MONTH)+1 < 10)
+//				data += "-0"+Integer.toString(turno.get(Calendar.MONTH)+1);
+//			else
+//				data += "-0"+Integer.toString(turno.get(Calendar.MONTH)+1);
+//			data += "-"+Integer.toString(turno.get(Calendar.DAY_OF_MONTH));
+//			
+//			//Se la data già c'è non aggiunge il turno
+//			for (int i=0; i<turni.size(); i++) {
+//				if (turni.get(i).get(1).toString().equals(data)) {
+//					return false;
+//				}
+//			}
 			
 			String sql = "INSERT INTO turno (data, cod_evento) VALUES ("
 					+ "?, null)";
@@ -1231,16 +1238,17 @@ public class Database {
 
 
 	/**
-	 * Restituisce il giorno attuale (usata per inserire il turno odierno)
+	 * Restituisce il giorno attuale del turno in corso
+	 * quindi se sono prima delle 9 a.m. restituisce la data scorsa
+	 * (usata per inserire il turno odierno)
 	 * @return
 	 */
 	public static Calendar getOggi() {
 		Calendar turno = Calendar.getInstance();
-		turno.set(Calendar.YEAR, turno.get(Calendar.YEAR));
-		turno.set(Calendar.MONTH, turno.get(Calendar.MONTH));
-		turno.set(Calendar.DATE, turno.get(Calendar.DAY_OF_MONTH));
-		turno.set(Calendar.HOUR_OF_DAY, turno.get(Calendar.HOUR_OF_DAY));
+		if (!(turno.get(Calendar.HOUR_OF_DAY) >= 9))
+			turno.add(Calendar.DATE, -1);
 		return turno;
+			 
 	}
 	
 	/**
