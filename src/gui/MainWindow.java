@@ -57,12 +57,14 @@ public class MainWindow extends JFrame{
 	 * @param pannello
 	 */
 	public void setPanel(JPanel pannello) {
+		System.out.println("Settaggio pannello...");
 		logo_panel.add(logo);
 		window.add(logo_panel);
 		this.pannello = pannello;
 		window.add(pannello);
 		add(window);
 		revalidate();
+		System.out.println("OK!");
 	}
 	
 	/**

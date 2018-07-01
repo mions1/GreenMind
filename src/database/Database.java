@@ -75,25 +75,23 @@ public class Database {
 	
 	/**
 	 * Stabilisce la connessione con il database GreenMind in localhost
+	 * @throws ClassNotFoundException 
+	 * @throws SQLException 
 	 */
-	public Database (String nome_db, String nome_account, String psw) {
+	public Database (String nome_db, String nome_account, String psw) throws ClassNotFoundException, SQLException {
 		c = null;
-		
-		try {
         Class.forName("org.postgresql.Driver");
         c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/"+nome_db, 
         		nome_account, psw);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 	
 	//-----------------GESTIONE DB, SCHEMA, TABELLE, TRIGGERS e VALORI DI ESEMPIO--------------
 	
 	/**
 	 * Elimina lo schema e lo ricrea
+	 * @return true se è andato bene, false in caso di errore
 	 */
-	public void deleteAll() {
+	public boolean deleteAll() {
 		try {
 			Statement stmt = c.createStatement();
 			String sql = "DROP SCHEMA public CASCADE;";
@@ -103,7 +101,9 @@ public class Database {
 			stmt.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		}
+		return true;
 	}
 	
 	/**
@@ -214,8 +214,9 @@ public class Database {
 	
 	/**
 	 * Crea Triggers sul db
+	 * @return true se è andato tutto bene, false altrimenti
 	 */
-	public void creaTriggers() {
+	public boolean creaTriggers() {
 		try {
 			Statement stmt = c.createStatement();
 			//setBonus
@@ -303,7 +304,31 @@ public class Database {
 			stmt.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		}
+		return true;
+	}
+	
+	public boolean creaIndici() {
+		try {
+			Statement stmt = c.createStatement();
+			//setBonus
+			String sql = "CREATE INDEX IF NOT EXISTS cf_idx ON persona (cf)";
+			stmt.executeUpdate(sql);
+			
+			sql = "CREATE INDEX IF NOT EXISTS cod_ordine_idx ON ordine (cod_ordine)";
+			stmt.executeUpdate(sql);
+			 
+			sql = "CREATE INDEX IF NOT EXISTS cod_prodotto_idx ON prodotto (cod_prodotto)";
+			stmt.executeUpdate(sql);
+			
+			stmt.close();
+		} catch (SQLException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 	
 	/**
@@ -482,33 +507,7 @@ public class Database {
 				if (!res.getBoolean(1))
 					return 1;
 			}
-				/*
-				sql = "INSERT INTO presenta VALUES ("
-						+cod_prod.get(i)+", "
-								+cod_ordine+", "+qta.get(i)+")";
-				stmt.executeUpdate(sql);
-			}
-			stmt.close();
-		} catch (SQLException e) {
-			// TODO: handle exception
-			System.err.println(e.getMessage());
-			return false;
-		}
-		
-		//Rimozione prodotti portati
-		try {
-			System.out.println("Rimozione prodotti");
-			Statement stmt = c.createStatement();
-			String sql = "";
-			for (int i=0; i<cod_prod.size(); i++) {
-				sql = "UPDATE prodotto "
-						+ "SET qta=(SELECT qta FROM prodotto WHERE nome="
-						+ "(SELECT nome FROM prodotto WHERE cod_prodotto="
-						+ cod_prod.get(i)+"))-"+qta.get(i)
-						+ " WHERE nome=(SELECT nome FROM prodotto WHERE cod_prodotto="
-						+ cod_prod.get(i)+")";
-				stmt.executeUpdate(sql);
-				*/
+				
 		} catch (SQLException e) {
 			// TODO: handle exception
 			System.err.println(e.getMessage());
@@ -609,7 +608,7 @@ public class Database {
 	 * @param nome nome del bonus (argento, oro etc)
 	 * @param soglia spesa che bisogna effettuare per raggiungere il bonus
 	 * @param sconto quanto sconto si ha diritto (10 = 10%)
-	 * @return
+	 * @return true se è andato tutto bene, false altrimenti
 	 */
 	public boolean nuovoBonus(String nome, int soglia, int sconto) {
 		try {
@@ -628,7 +627,7 @@ public class Database {
 
 	/**
 	 * Seleziona tutte le persone registrate nel db
-	 * @return lista delle persone che soddisfano i suddetti predicati
+	 * @return lista delle persone che soddisfano i suddetti predicati o null se è andato male qualcosa
 	 */
 	public ArrayList<ArrayList<String>> getPersone() {
 		ArrayList<String> persona = new ArrayList<String>();
@@ -656,6 +655,7 @@ public class Database {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 		
 		return persone;
@@ -665,7 +665,7 @@ public class Database {
 	 * Seleziona tutte le persone registrate nel db con la possibilità di scegliere se dipendenti o clienti
 	 * @param dipendente true se si vogliono anche i dipendenti
 	 * @param cliente true se si vogliono anche i clienti
-	 * @return lista delle persone che soddisfano i suddetti predicati
+	 * @return lista delle persone che soddisfano i suddetti predicati  o null se è andato male qualcosa
 	 */
 	public ArrayList<ArrayList<String>> getPersone(boolean dipendente, boolean cliente) {
 		ArrayList<String> persona = new ArrayList<String>();
@@ -694,6 +694,7 @@ public class Database {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 		
 		return persone;
@@ -702,7 +703,7 @@ public class Database {
 	/**
 	 * Seleziona i dipendenti con un certo ruolo
 	 * @param ruolo ruolo dei dipendenti da recuperare
-	 * @return Lista dei dipendenti col dato ruolo
+	 * @return Lista dei dipendenti col dato ruolo  o null se è andato male qualcosa
 	 */
 	public ArrayList<ArrayList<String>> getPersone(String ruolo) {
 		ArrayList<String> persona = new ArrayList<String>();
@@ -730,6 +731,7 @@ public class Database {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 		
 		return persone;
@@ -738,7 +740,7 @@ public class Database {
 	/**
 	 * Recupero dei prodotti di un dato tipo
 	 * @param tipo tipo dei prodotti da recuperare (MENU_CANNABIS, etc)
-	 * @return lista dei prodotti del tipo scelto
+	 * @return lista dei prodotti del tipo scelto o null se è andato male qualcosa
 	 */
 	public ArrayList<ArrayList<String>> getMenu(int tipo) {
 		ArrayList<ArrayList<String>> menu = new ArrayList<ArrayList<String>>();
@@ -764,6 +766,7 @@ public class Database {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 		return menu;
 	}
@@ -771,7 +774,7 @@ public class Database {
 	/**
 	 * Recupero di un prodotto dato il nome
 	 * @param nome prodotto da recuperare
-	 * @return lista dei campi del prodotto scelto
+	 * @return lista dei campi del prodotto scelto o null se è andato male qualcosa
 	 */
 	public ArrayList<String>  getProdotto (String nome) {
 		ArrayList<String> prodotto = new ArrayList<String>();
@@ -794,13 +797,14 @@ public class Database {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 		return prodotto;
 	}
 	
 	/**
 	 * Recupero dei prodotti nel db
-	 * @return lista dei prodotti
+	 * @return lista dei prodotti o null se è andato male qualcosa
 	 */
 	public ArrayList<ArrayList<String>> getProdotti() {
 		ArrayList<ArrayList<String>> prodotti = new ArrayList<ArrayList<String>>();
@@ -825,13 +829,14 @@ public class Database {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 		return prodotti;
 	}
 	
 	/**
 	 * Restituisce i turni inseriti
-	 * @return lista dei turni nel db
+	 * @return lista dei turni nel db  o null se è andato male qualcosa
 	 */
 	public ArrayList<ArrayList<String>> getTurni() {
 		ArrayList<ArrayList<String>> turni = new ArrayList<ArrayList<String>>();
@@ -850,6 +855,7 @@ public class Database {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 		
 		return turni;
@@ -859,7 +865,7 @@ public class Database {
 	 * Restituisce i turni nel quale un dipendete lavora oppure no
 	 * @param lavora true se vogliamo i turni nel quale lavora, false altrimenti
 	 * @param cf codice fiscale del dipendente
-	 * @return lista dei turni nel db
+	 * @return lista dei turni nel db o null se è andato male qualcosa
 	 */
 	public ArrayList<ArrayList<String>> getTurni(String cf, Boolean lavora) {
 		ArrayList<ArrayList<String>> turni = new ArrayList<ArrayList<String>>();
@@ -893,6 +899,7 @@ public class Database {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 		
 		return turni;
@@ -901,7 +908,7 @@ public class Database {
 	/**
 	 * Restituisce i turni da una certa data in poi
 	 * @param data data dalla quale partire
-	 * @return
+	 * @return la lista dei turni in quella data o null se è andato male qualcosa
 	 */
 	public ArrayList<ArrayList<String>> getTurni(Calendar data) {
 		ArrayList<ArrayList<String>> turni = new ArrayList<ArrayList<String>>();
@@ -921,6 +928,7 @@ public class Database {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 		
 		return turni;
@@ -929,7 +937,7 @@ public class Database {
 	/**
 	 * Restituisce il codice di un turno nella data richiesta
 	 * @param data data richiesta
-	 * @return
+	 * @return codice della data richiesta o -1 in caso di errori
 	 */
 	public int getCod_turnoFromDate(Calendar data) {
 		try {
@@ -943,13 +951,13 @@ public class Database {
 		} catch (SQLException e) {
 			// TODO: handle exception
 			System.err.println(e.getMessage());
+			return -1;
 		}
-		return -1;
 	}
 	
 	/**
 	 * Restituisce gli eventi inseriti nel db
-	 * @return lista degli eventi
+	 * @return lista degli eventi o null se è andato male qualcosa
 	 */
 	public ArrayList<ArrayList<String>> getEventi() {
 		ArrayList<ArrayList<String>> eventi = new ArrayList<ArrayList<String>>();
@@ -968,6 +976,7 @@ public class Database {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 		
 		return eventi;
@@ -976,7 +985,7 @@ public class Database {
 	/**
 	 * Restitusce lo sconto di cui ha diritto una persona
 	 * @param cf cf della persona di cui prendere lo sconto
-	 * @return lo sconto da applicare
+	 * @return lo sconto da applicare o -1 in caso d errori
 	 */
 	public int getSconto(String cf) {
 		int sconto = 0;
@@ -986,10 +995,10 @@ public class Database {
 			ResultSet res = stmt.executeQuery(sql);
 			res.next();
 			sconto = res.getInt(1);
-			System.out.println(sconto);
 			stmt.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return -1;
 		}
 		return sconto;
 	}
@@ -998,7 +1007,7 @@ public class Database {
 	 * Restituisce tutti gli ordini ed i relativi prodotti di un dato tavolo, consegnati oppure no
 	 * @param tavolo tavolo
 	 * @param consegnato false per gli ordini non consegnati, true per tutti
-	 * @return lista degli ordini del tavolo
+	 * @return lista degli ordini del tavolo o null se è andato male qualcosa
 	 */
 	public ArrayList<ArrayList<String>> getOrdine(int tavolo, boolean consegnato) {
 		
@@ -1006,38 +1015,7 @@ public class Database {
 		ArrayList<String> ordine;
 		
 		try {
-			Statement stmt = c.createStatement();
-			
-			/*
-			System.out.println("Creazione view1...");
-			String ordini_tavolo = "CREATE OR REPLACE TEMP VIEW ordini_tavolo AS "
-					+ "(SELECT * FROM ordine WHERE "
-					+ "tavolo="+tavolo;
-			ordini_tavolo += consegnato ? ")" : " AND consegnato=false)" ;
-			stmt.executeUpdate(ordini_tavolo);
-			System.out.println("OK!");
-			
-			System.out.println("Creazione view2");
-			String ordini_presenta = "CREATE OR REPLACE TEMP VIEW ordini_presenta AS "
-					+ "SELECT presenta.cod_ordine, presenta.cod_prodotto, qta, tavolo, cf, sconto "
-					+ "FROM presenta,ordini_tavolo "
-					+ "where presenta.cod_ordine in "
-					+ "(SELECT cod_ordine from ordini_tavolo group by cod_ordine) "
-					+ "AND presenta.cod_ordine = ordini_tavolo.cod_ordine";
-			stmt.executeUpdate(ordini_presenta);
-			System.out.println("OK!");
-			
-			System.out.println("Select ordini...");
-			String sql = "SELECT cod_ordine, nome, ordini_presenta.qta, tavolo, prezzo, cf, sconto "
-					+ "FROM prodotto, ordini_presenta "
-					+ "WHERE prodotto.cod_prodotto in "
-					+ "(SELECT cod_prodotto FROM ordini_presenta "
-					+ "group by cod_prodotto) "
-					+ "AND ordini_presenta.cod_prodotto=prodotto.cod_prodotto "
-					+ "group by cod_ordine, tavolo, cf, ordini_presenta.qta, nome, prezzo, sconto";
-			
-			*/
-			
+			Statement stmt = c.createStatement();		
 			String sql = "SELECT ordine.cod_ordine, prodotto.nome, presenta.qta, tavolo, prezzo, cf, sconto, totale "
 					+ "FROM ordine, presenta, prodotto "
 					+ "WHERE ordine.cod_ordine = presenta.cod_ordine "
@@ -1047,7 +1025,7 @@ public class Database {
 					+ "GROUP BY ordine.cod_ordine, tavolo, cf, presenta.qta, nome, prezzo, sconto, totale";
 					
 			ResultSet res = stmt.executeQuery(sql);
-			System.out.println("OK!");
+			
 			while (res.next()) {
 				ordine = new ArrayList<>();
 				ordine.add(Integer.toString(res.getInt(1)));	//cod_ordine
@@ -1060,9 +1038,10 @@ public class Database {
 				ordine.add(Float.toString(res.getFloat(8)));
 				ordini.add(ordine);
 			}
-			System.out.println(ordini);
+			
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
+			return null;
 		}
 		
 		return ordini;
@@ -1073,10 +1052,10 @@ public class Database {
 	/**
 	 * Elimina un ordine col tale codice
 	 * @param cod_ordine cod dell'ordine da eliminare
-	 * @return true se è stato eliminato
+	 * @return true se è stato eliminato, false se è andato male qualcosa
 	 */
 	public boolean eliminaOrdine(int cod_ordine) {
-		System.out.println("Elimina ordine...");
+		
 		try {
 			Statement stmt = c.createStatement();
 			String sql = "DELETE FROM ordine where cod_ordine="+cod_ordine;
@@ -1086,7 +1065,7 @@ public class Database {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("OK!");
+		
 		return true;
 	}
 	
@@ -1129,7 +1108,7 @@ public class Database {
 	/**
 	 * Elimina un turno col tale codice
 	 * @param cod codice del turno
-	 * @return
+	 * @return true se è andato tutto bene, false altrimenti
 	 */
 	public boolean eliminaTurno(int cod) {
 		try {
@@ -1167,7 +1146,7 @@ public class Database {
 	/**
 	 * Verifica se esiste un cliente con il dato cf
 	 * @param cf
-	 * @return
+	 * @return true se è andato tutto bene false altrimenti
 	 */
 	public boolean loginCliente(String cf) {
 		Statement stmt;
@@ -1188,7 +1167,7 @@ public class Database {
 	/**
 	 * Verifica se esiste un cameriere col dato cf
 	 * @param cf
-	 * @return
+	 * @return true se è andato tutto bene false altrimenti
 	 */
 	public boolean loginCameriere(String cf) {
 		Statement stmt;
@@ -1218,7 +1197,7 @@ public class Database {
 	/**
 	 * Verifica se esiste un gestore col dato cf
 	 * @param cf
-	 * @return
+	 * @return true se è andato tutto bene false altrimenti
 	 */
 	public boolean loginGestore(String cf) {
 		Statement stmt;
@@ -1241,7 +1220,7 @@ public class Database {
 	 * Restituisce il giorno attuale del turno in corso
 	 * quindi se sono prima delle 9 a.m. restituisce la data scorsa
 	 * (usata per inserire il turno odierno)
-	 * @return
+	 * @return restituisce come da definizione
 	 */
 	public static Calendar getOggi() {
 		Calendar turno = Calendar.getInstance();
@@ -1271,10 +1250,10 @@ public class Database {
 	 * Modifica un ordine per impostarlo come consegnato
 	 * @param consegnato
 	 * @param cod_ordine
-	 * @return
+	 * @return true se è andato tutto bene false altrimenti
 	 */
 	public boolean setConsegnato(boolean consegnato, int cod_ordine) {
-		System.out.println("Set consegnato...");
+
 		try {
 			Statement stmt = c.createStatement();
 			String sql = "UPDATE ordine set consegnato="+consegnato+" where cod_ordine="+cod_ordine;
@@ -1283,32 +1262,34 @@ public class Database {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		}
-		System.out.println("OK!");
+
 		return true;
 	}
 	
 	/**
 	 * Esegue la query passata
 	 * @param query query da eseguire
-	 * @return il risultato della query
+	 * @return il risultato della query o null se è andato storto qualcosa
 	 */
 	public ResultSet eseguiQuery(String query) {
 		ResultSet res = null;
-		System.out.println("Eseguo query...");
+
 		try {
 			Statement stmt = c.createStatement();
 			res = stmt.executeQuery(query);
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
+			return null;
 		}
-		System.out.println("OK!");
+
 		return res;
 	}
 	
 	/**
 	 * Restituisce i tavoli che hanno ordini non consegnati
-	 * @return tavoli con ordini non consegnati
+	 * @return tavoli con ordini non consegnati o null se è andato storto qualcosa
 	 */
 	public ArrayList<Integer> getTavoliAttivi() {
 		ArrayList<Integer> tavoli = new ArrayList<Integer>();
@@ -1323,6 +1304,7 @@ public class Database {
 			stmt.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return null;
 		}
 		
 		return tavoli;
@@ -1332,7 +1314,7 @@ public class Database {
 	 * Modifica un prodotto impostandone la qta passata
 	 * @param cod prodotto da modificare
 	 * @param qta quantità da impostare al prodotto
-	 * @return 
+	 * @return true se è andato tutto bene false altrimenti
 	 */
 	public boolean aggiungiQtaProdotto(int cod, int qta) {
 		try {
@@ -1351,7 +1333,7 @@ public class Database {
 	 * Aggiunge un evento al turno
 	 * @param cod_turno turno al quale aggiungere l'evento
 	 * @param cod_evento evento da aggiungere
-	 * @return
+	 * @return true se è andato tutto bene false altrimenti
 	 */
 	public boolean aggiungiEventoAlTurno(int cod_turno, int cod_evento) {
 		try {
@@ -1373,7 +1355,7 @@ public class Database {
 	 * nel DB che controlla se il cf passato è di un dipendente
 	 * @param cf codice fiscale dipendente
 	 * @param cod_turno codice del turno in cui aggiungerlo
-	 * @return
+	 * @return true se è andato tutto bene false altrimenti
 	 */
 	public boolean aggiungiDipendenteAlTurno(String cf, int cod_turno) {
 		try {
@@ -1391,6 +1373,12 @@ public class Database {
 		}
 	}
 	
+	/**
+	 * Elimina un dipendente dal turno di lavoro
+	 * @param cf codice fiscale dipendente
+	 * @param cod_turno codice del turno da cui eliminarlo
+	 * @return true se è andato tutto bene false altrimenti
+	 */
 	public boolean eliminaDipendenteDalTurno(String cf, int cod_turno) {
 		try {
 			Statement stmt = c.createStatement();

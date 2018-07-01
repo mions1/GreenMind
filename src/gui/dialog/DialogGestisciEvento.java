@@ -96,6 +96,7 @@ public class DialogGestisciEvento extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getSource().equals(inserisci)) {
+			
 			if (source.getLoginWindow().getDb().nuovoEvento(
 					nome.getText(), tipo.getText())) {
 				JOptionPane.showMessageDialog(null, "Evento aggiunto", "Ok", JOptionPane.INFORMATION_MESSAGE);
