@@ -1,5 +1,6 @@
-Se si vuole dare i permessi di esecuzione a init.sh con 'sudo chmod 777 init.sh'
-Eseguire tale script, esso farà:
+Se si vuole dare i permessi di esecuzione a init.sh: 'sudo chmod 777 init.sh'
+
+Eseguendo tale script, esso farà:
 1. installazione postgresql se non installato
 2. settaggio password per utente postgres
 3. creazione database GreenMind (crea solo il db, non lo schema, ci penserà il programmino java per quello)
